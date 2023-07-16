@@ -10,7 +10,7 @@ class jogo:
         clock = pygame.time.Clock()
 
         pygame.init()
-        self.contador = 0
+        self.contador = 1
         largura = 1080
         altura = 650
         dt = 0
@@ -23,10 +23,14 @@ class jogo:
         self.comida = []
         self.lugares_aletorios = []
 
-        self.player_cor = 'blue'
+        self.player_cor = 'black'
         self.fundo_cor = 'purple'
 
-        self.criar_massas(5)
+        self.player_velocidade = 235
+
+        self.massa_comida = 5
+
+        self.criar_massas(20)
 
         while True:
             for event in pygame.event.get():
@@ -34,12 +38,12 @@ class jogo:
                     pygame.quit()
                     exit()
 
-                while len(self.comida) != 5:
+                while len(self.comida) != 20:
                     self.criar_massas(1)
 
             self.tela.fill(self.fundo_cor)
             try:
-                self.manter_massas(5)
+                self.manter_massas(20)
             except:
                 pass
             
@@ -50,19 +54,77 @@ class jogo:
                 pass
             keys = pygame.key.get_pressed()
             if keys[pygame.K_w]:
-                self.player_pos.y -= 200 * dt
+                self.player_pos.y -= self.player_velocidade * dt
             if keys[pygame.K_d]:
-                self.player_pos.x += 200 * dt
+                self.player_pos.x += self.player_velocidade * dt
             if keys[pygame.K_a]:
-                self.player_pos.x -= 200 * dt
+                self.player_pos.x -= self.player_velocidade * dt
             if keys[pygame.K_s]:
-                self.player_pos.y += 200 * dt
+                self.player_pos.y += self.player_velocidade * dt
 
-            self.pontos_por_comida = 400
+            self.pontos_por_comida = 5
 
-            # Verfica a colisão uma de cada vez
             try:
                 if self.player.collideobjectsall(self.comida):
+                    if self.player.colliderect(self.comida[19]):
+                        del self.comida[19]
+                        del self.lugares_aletorios[19]
+                        self.player_massa += self.pontos_por_comida
+                    if self.player.colliderect(self.comida[18]):
+                        del self.comida[18]
+                        del self.lugares_aletorios[18]
+                        self.player_massa += self.pontos_por_comida
+                    if self.player.colliderect(self.comida[17]):
+                        del self.comida[17]
+                        del self.lugares_aletorios[17]
+                        self.player_massa += self.pontos_por_comida
+                    if self.player.colliderect(self.comida[16]):
+                        del self.comida[16]
+                        del self.lugares_aletorios[16]
+                        self.player_massa += self.pontos_por_comida
+                    if self.player.colliderect(self.comida[15]):
+                        del self.comida[15]
+                        del self.lugares_aletorios[15]
+                        self.player_massa += self.pontos_por_comida
+                    if self.player.colliderect(self.comida[14]):
+                        del self.comida[14]
+                        del self.lugares_aletorios[14]
+                        self.player_massa += self.pontos_por_comida
+                    if self.player.colliderect(self.comida[13]):
+                        del self.comida[13]
+                        del self.lugares_aletorios[13]
+                        self.player_massa += self.pontos_por_comida
+                    if self.player.colliderect(self.comida[12]):
+                        del self.comida[12]
+                        del self.lugares_aletorios[12]
+                        self.player_massa += self.pontos_por_comida
+                    if self.player.colliderect(self.comida[11]):
+                        del self.comida[11]
+                        del self.lugares_aletorios[11]
+                        self.player_massa += self.pontos_por_comida
+                    if self.player.colliderect(self.comida[10]):
+                        del self.comida[10]
+                        del self.lugares_aletorios[10]
+                    if self.player.colliderect(self.comida[9]):
+                        del self.comida[9]
+                        del self.lugares_aletorios[9]
+                        self.player_massa += self.pontos_por_comida
+                    if self.player.colliderect(self.comida[8]):
+                        del self.comida[8]
+                        del self.lugares_aletorios[8]
+                        self.player_massa += self.pontos_por_comida
+                    if self.player.colliderect(self.comida[7]):
+                        del self.comida[7]
+                        del self.lugares_aletorios[7]
+                        self.player_massa += self.pontos_por_comida
+                    if self.player.colliderect(self.comida[6]):
+                        del self.comida[6]
+                        del self.lugares_aletorios[6]
+                        self.player_massa += self.pontos_por_comida
+                    if self.player.colliderect(self.comida[5]):
+                        del self.comida[5]
+                        del self.lugares_aletorios[5]
+                        self.player_massa += self.pontos_por_comida
                     if self.player.colliderect(self.comida[4]):
                         del self.comida[4]
                         del self.lugares_aletorios[4]
@@ -86,39 +148,43 @@ class jogo:
             except:
                 pass
             
-            #dificulta o jogo quando a massa chega a mais de 400
             if self.player_massa > 400:
                 self.pontos_por_comida = 1
             try:
-                if self.player_massa > 700:
+                if self.player_massa > 800:
+                    self.player_velocidade = 235
+                    self.massa_comida = 5
                     self.player_massa = 20
                     self.contador += 1
                     self.fundo_cor = Transicions.Trans.backgroud_color(self.contador)
-                    # verifica se a cor de fundo é igual a do player, caso seja, fica em um loop até não ser mais
-                    while True:
-                        self.player_cor = Transicions.Trans.player_color(self.contador) 
-                        if self.player_cor != self.fundo_cor:
-                            break
+                    self.player_cor = Transicions.Trans.player_color(self.contador)
             except:
                 pass
             
+            if self.player_massa > 100 and self.player_massa < 200:
+                self.player_velocidade = 200
+                self.pontos_por_comida = 0.1
+            if self.player_massa > 200:
+                self.player_velocidade = 250
+                self.pontos_por_comida = 0.00000000000001
+
             pygame.display.flip()
 
             dt = clock.tick(60) / 1000
-    
-    #cria massas
+        
     def criar_massas(self, x):
         for c in range(x):
             lugar_aleatorio_x = random.randrange(1, 1080)
             lugar_aleatorio_y = random.randrange(1, 650)
 
+            # lugares_aletorios = [lugar_aleatorio_x, lugar_aleatorio_y]
             self.lugares_aletorios.append([lugar_aleatorio_x, lugar_aleatorio_y])
-            self.comida.append(pygame.draw.circle(self.tela, self.player_cor, self.lugares_aletorios[c], 10))
+            self.comida.append(pygame.draw.circle(self.tela, self.player_cor, self.lugares_aletorios[c], self.massa_comida))
 
-    #mantem as massas visiveis
+
     def manter_massas(self, x):
         for c in range(x):
-            self.comida[c] = pygame.draw.circle(self.tela, self.player_cor, self.lugares_aletorios[c], 10)
+            self.comida[c] = pygame.draw.circle(self.tela, self.player_cor, self.lugares_aletorios[c], self.massa_comida)
 
 
 if __name__ == "__main__":
