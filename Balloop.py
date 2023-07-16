@@ -62,7 +62,7 @@ class jogo:
             if keys[pygame.K_s]:
                 self.player_pos.y += self.player_velocidade * dt
 
-            self.pontos_por_comida = 5
+            self.pontos_por_comida = 200
 
             try:
                 if self.player.collideobjectsall(self.comida):
@@ -157,7 +157,10 @@ class jogo:
                     self.player_massa = 20
                     self.contador += 1
                     self.fundo_cor = Transicions.Trans.backgroud_color(self.contador)
-                    self.player_cor = Transicions.Trans.player_color(self.contador)
+                    while True:
+                        self.player_cor = Transicions.Trans.player_color(self.contador) 
+                        if self.player_cor != self.fundo_cor:
+                            break
             except:
                 pass
             
