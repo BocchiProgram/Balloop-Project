@@ -5,7 +5,7 @@ from time import sleep
 from pygame.locals import *
 from sys import exit
 
-class jogo:
+class Jogo:
     def __init__(self):
         clock = pygame.time.Clock()
 
@@ -38,9 +38,6 @@ class jogo:
                     pygame.quit()
                     exit()
 
-                while len(self.comida) != 20:
-                    self.criar_massas(1)
-
             self.tela.fill(self.fundo_cor)
             try:
                 self.manter_massas(20)
@@ -62,96 +59,96 @@ class jogo:
             if keys[pygame.K_s]:
                 self.player_pos.y += self.player_velocidade * dt
 
-            self.pontos_por_comida = 200
+            self.pontos_por_comida = 5
 
-            try:
-                if self.player.collideobjectsall(self.comida):
-                    if self.player.colliderect(self.comida[19]):
-                        del self.comida[19]
-                        del self.lugares_aletorios[19]
-                        self.player_massa += self.pontos_por_comida
-                    if self.player.colliderect(self.comida[18]):
-                        del self.comida[18]
-                        del self.lugares_aletorios[18]
-                        self.player_massa += self.pontos_por_comida
-                    if self.player.colliderect(self.comida[17]):
-                        del self.comida[17]
-                        del self.lugares_aletorios[17]
-                        self.player_massa += self.pontos_por_comida
-                    if self.player.colliderect(self.comida[16]):
-                        del self.comida[16]
-                        del self.lugares_aletorios[16]
-                        self.player_massa += self.pontos_por_comida
-                    if self.player.colliderect(self.comida[15]):
-                        del self.comida[15]
-                        del self.lugares_aletorios[15]
-                        self.player_massa += self.pontos_por_comida
-                    if self.player.colliderect(self.comida[14]):
-                        del self.comida[14]
-                        del self.lugares_aletorios[14]
-                        self.player_massa += self.pontos_por_comida
-                    if self.player.colliderect(self.comida[13]):
-                        del self.comida[13]
-                        del self.lugares_aletorios[13]
-                        self.player_massa += self.pontos_por_comida
-                    if self.player.colliderect(self.comida[12]):
-                        del self.comida[12]
-                        del self.lugares_aletorios[12]
-                        self.player_massa += self.pontos_por_comida
-                    if self.player.colliderect(self.comida[11]):
-                        del self.comida[11]
-                        del self.lugares_aletorios[11]
-                        self.player_massa += self.pontos_por_comida
-                    if self.player.colliderect(self.comida[10]):
-                        del self.comida[10]
-                        del self.lugares_aletorios[10]
-                    if self.player.colliderect(self.comida[9]):
-                        del self.comida[9]
-                        del self.lugares_aletorios[9]
-                        self.player_massa += self.pontos_por_comida
-                    if self.player.colliderect(self.comida[8]):
-                        del self.comida[8]
-                        del self.lugares_aletorios[8]
-                        self.player_massa += self.pontos_por_comida
-                    if self.player.colliderect(self.comida[7]):
-                        del self.comida[7]
-                        del self.lugares_aletorios[7]
-                        self.player_massa += self.pontos_por_comida
-                    if self.player.colliderect(self.comida[6]):
-                        del self.comida[6]
-                        del self.lugares_aletorios[6]
-                        self.player_massa += self.pontos_por_comida
-                    if self.player.colliderect(self.comida[5]):
-                        del self.comida[5]
-                        del self.lugares_aletorios[5]
-                        self.player_massa += self.pontos_por_comida
-                    if self.player.colliderect(self.comida[4]):
-                        del self.comida[4]
-                        del self.lugares_aletorios[4]
-                        self.player_massa += self.pontos_por_comida
-                    if self.player.colliderect(self.comida[3]):
-                        del self.comida[3]
-                        del self.lugares_aletorios[3]
-                        self.player_massa += self.pontos_por_comida
-                    if self.player.colliderect(self.comida[2]):
-                        del self.comida[2]
-                        del self.lugares_aletorios[2]
-                        self.player_massa += self.pontos_por_comida
-                    if self.player.colliderect(self.comida[1]):
-                        del self.comida[1]
-                        del self.lugares_aletorios[1]
-                        self.player_massa += self.pontos_por_comida
-                    if self.player.colliderect(self.comida[0]):
-                        del self.comida[0]
-                        del self.lugares_aletorios[0]
-                        self.player_massa += self.pontos_por_comida
-            except:
-                pass
+            self.colisao()
+            
+            # if self.player.collideobjectsall(self.comida):
+            #     if self.player.colliderect(self.comida[19]):
+            #         del self.comida[19]
+            #         del self.lugares_aletorios[19]
+            #         self.player_massa += self.pontos_por_comida
+            #     if self.player.colliderect(self.comida[18]):
+            #         del self.comida[18]
+            #         del self.lugares_aletorios[18]
+            #         self.player_massa += self.pontos_por_comida
+            #     if self.player.colliderect(self.comida[17]):
+            #         del self.comida[17]
+            #         del self.lugares_aletorios[17]
+            #         self.player_massa += self.pontos_por_comida
+            #     if self.player.colliderect(self.comida[16]):
+            #         del self.comida[16]
+            #         del self.lugares_aletorios[16]
+            #         self.player_massa += self.pontos_por_comida
+            #     if self.player.colliderect(self.comida[15]):
+            #         del self.comida[15]
+            #         del self.lugares_aletorios[15]
+            #         self.player_massa += self.pontos_por_comida
+            #     if self.player.colliderect(self.comida[14]):
+            #         del self.comida[14]
+            #         del self.lugares_aletorios[14]
+            #         self.player_massa += self.pontos_por_comida
+            #     if self.player.colliderect(self.comida[13]):
+            #         del self.comida[13]
+            #         del self.lugares_aletorios[13]
+            #         self.player_massa += self.pontos_por_comida
+            #     if self.player.colliderect(self.comida[12]):
+            #         del self.comida[12]
+            #         del self.lugares_aletorios[12]
+            #         self.player_massa += self.pontos_por_comida
+            #     if self.player.colliderect(self.comida[11]):
+            #         del self.comida[11]
+            #         del self.lugares_aletorios[11]
+            #         self.player_massa += self.pontos_por_comida
+            #     if self.player.colliderect(self.comida[10]):
+            #         del self.comida[10]
+            #         del self.lugares_aletorios[10]
+            #     if self.player.colliderect(self.comida[9]):
+            #         del self.comida[9]
+            #         del self.lugares_aletorios[9]
+            #         self.player_massa += self.pontos_por_comida
+            #     if self.player.colliderect(self.comida[8]):
+            #         del self.comida[8]
+            #         del self.lugares_aletorios[8]
+            #         self.player_massa += self.pontos_por_comida
+            #     if self.player.colliderect(self.comida[7]):
+            #         del self.comida[7]
+            #         del self.lugares_aletorios[7]
+            #         self.player_massa += self.pontos_por_comida
+            #     if self.player.colliderect(self.comida[6]):
+            #         del self.comida[6]
+            #         del self.lugares_aletorios[6]
+            #         self.player_massa += self.pontos_por_comida
+            #     if self.player.colliderect(self.comida[5]):
+            #         del self.comida[5]
+            #         del self.lugares_aletorios[5]
+            #         self.player_massa += self.pontos_por_comida
+            #     if self.player.colliderect(self.comida[4]):
+            #         del self.comida[4]
+            #         del self.lugares_aletorios[4]
+            #         self.player_massa += self.pontos_por_comida
+            #     if self.player.colliderect(self.comida[3]):
+            #         del self.comida[3]
+            #         del self.lugares_aletorios[3]
+            #         self.player_massa += self.pontos_por_comida
+            #     if self.player.colliderect(self.comida[2]):
+            #         del self.comida[2]
+            #         del self.lugares_aletorios[2]
+            #         self.player_massa += self.pontos_por_comida
+            #     if self.player.colliderect(self.comida[1]):
+            #         del self.comida[1]
+            #         del self.lugares_aletorios[1]
+            #         self.player_massa += self.pontos_por_comida
+            #     if self.player.colliderect(self.comida[0]):
+            #         del self.comida[0]
+            #         del self.lugares_aletorios[0]
+            #         self.player_massa += self.pontos_por_comida
+
             
             if self.player_massa > 400:
                 self.pontos_por_comida = 1
             try:
-                if self.player_massa > 800:
+                if self.player_massa > 1500:
                     self.player_velocidade = 235
                     self.massa_comida = 5
                     self.player_massa = 20
@@ -184,11 +181,18 @@ class jogo:
             self.lugares_aletorios.append([lugar_aleatorio_x, lugar_aleatorio_y])
             self.comida.append(pygame.draw.circle(self.tela, self.player_cor, self.lugares_aletorios[c], self.massa_comida))
 
-
     def manter_massas(self, x):
         for c in range(x):
             self.comida[c] = pygame.draw.circle(self.tela, self.player_cor, self.lugares_aletorios[c], self.massa_comida)
-
+    
+    def colisao(self):
+        if self.player.collideobjectsall(self.comida):
+            for c in range(len(self.comida)):
+                if self.player.colliderect(self.comida[c]):
+                    del self.comida[c]
+                    del self.lugares_aletorios[c]
+                    self.criar_massas(1)
+                    
 
 if __name__ == "__main__":
-    jogo()
+    Jogo()
