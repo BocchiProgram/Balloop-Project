@@ -4,85 +4,102 @@ from time import sleep
 from pygame.locals import *
 from sys import exit
 
-clock = pygame.time.Clock()
+class jogo:
+    def __init__(self):
+        clock = pygame.time.Clock()
 
-pygame.init()
+        pygame.init()
 
-largura = 1080
-altura = 650
-dt = 0
+        largura = 1080
+        altura = 650
+        dt = 0
 
-tela = pygame.display.set_mode((largura, altura))
-pygame.display.set_caption('Regular Game')
+        self.tela = pygame.display.set_mode((largura, altura))
+        pygame.display.set_caption('Regular Game')
 
-player_pos = pygame.Vector2(tela.get_width() / 2, tela.get_height() / 2)
-player_massa = 20
-comida = []
-lugares_aletorios = []
+        self.player_pos = pygame.Vector2(self.tela.get_width() / 2, self.tela.get_height() / 2)
+        self.player_massa = 20
+        self.comida = []
+        self.lugares_aletorios = []
 
-def criar_massas(x):
-    for c in range(x):
-        lugar_aleatorio_x = random.randrange(1, 1080)
-        lugar_aleatorio_y = random.randrange(1, 650)
+        self.player_cor = 'blue'
+        self.fundo_cor = 'purple'
 
-        # lugares_aletorios = [lugar_aleatorio_x, lugar_aleatorio_y]
-        lugares_aletorios.append([lugar_aleatorio_x, lugar_aleatorio_y])
-        comida.append(pygame.draw.circle(tela, "blue", lugares_aletorios[c], 10))
+        self.criar_massas(5)
 
+        while True:
+            for event in pygame.event.get():
+                if event.type == QUIT:
+                    pygame.quit()
+                    exit()
 
-def manter_massas():
-    for c in range(5):
-        comida[c] = pygame.draw.circle(tela, "blue", lugares_aletorios[c], 10)
+                while len(self.comida) != 5:
+                    self.criar_massas(1)
 
-criar_massas(5)
-
-
-while True:
-    for event in pygame.event.get():
-        if event.type == QUIT:
-            pygame.quit()
-            exit()
-
-        tela.fill('black')
-
-        if len(comida) < 5:
-            criar_massas(1)
+            self.tela.fill(self.fundo_cor)
+            try:
+                self.manter_massas(5)
+            except:
+                pass
             
-        manter_massas()
-        
-    #player 
-    player = pygame.draw.circle(tela, "white", player_pos, player_massa)   
+            #player 
+            self.player = pygame.draw.circle(self.tela, self.player_cor, self.player_pos, self.player_massa)   
+            
+            keys = pygame.key.get_pressed()
+            if keys[pygame.K_w]:
+                self.player_pos.y -= 200 * dt
+            if keys[pygame.K_d]:
+                self.player_pos.x += 200 * dt
+            if keys[pygame.K_a]:
+                self.player_pos.x -= 200 * dt
+            if keys[pygame.K_s]:
+                self.player_pos.y += 200 * dt
 
-    keys = pygame.key.get_pressed()
-    if keys[pygame.K_w]:
-        player_pos.y -= 200 * dt
-    if keys[pygame.K_d]:
-        player_pos.x += 200 * dt
-    if keys[pygame.K_a]:
-        player_pos.x -= 200 * dt
-    if keys[pygame.K_s]:
-        player_pos.y += 200 * dt
+            try:
+                if self.player.collideobjectsall(self.comida):
+                    if self.player.colliderect(self.comida[4]):
+                        del self.comida[4]
+                        del self.lugares_aletorios[4]
+                        self.player_massa += 30
+                    if self.player.colliderect(self.comida[3]):
+                        del self.comida[3]
+                        del self.lugares_aletorios[3]
+                        self.player_massa += 30
+                    if self.player.colliderect(self.comida[2]):
+                        del self.comida[2]
+                        del self.lugares_aletorios[2]
+                        self.player_massa += 30
+                    if self.player.colliderect(self.comida[1]):
+                        del self.comida[1]
+                        del self.lugares_aletorios[1]
+                        self.player_massa += 30
+                    if self.player.colliderect(self.comida[0]):
+                        del self.comida[0]
+                        del self.lugares_aletorios[0]
+                        self.player_massa += 30
+            except:
+                pass
+            
+            pygame.display.flip()
 
-
-    if player.collideobjects(comida):
-        player_massa +=5
-        if player.colliderect(comida[4]):
-            del comida[4]
-            del lugares_aletorios[4]
-        if player.colliderect(comida[3]):
-            del comida[3]
-            del lugares_aletorios[3]
-        if player.colliderect(comida[2]):
-            del comida[2]
-            del lugares_aletorios[2]
-        if player.colliderect(comida[1]):
-            del comida[1]
-            del lugares_aletorios[1]
-        if player.colliderect(comida[0]):
-            del comida[0]
-            del lugares_aletorios[0]
+            dt = clock.tick(60) / 1000
     
+    def criar_massas(self, x):
+        for c in range(x):
+            lugar_aleatorio_x = random.randrange(1, 1080)
+            lugar_aleatorio_y = random.randrange(1, 650)
 
-    pygame.display.flip()
-    
-    dt = clock.tick(60) / 1000
+            # lugares_aletorios = [lugar_aleatorio_x, lugar_aleatorio_y]
+            self.lugares_aletorios.append([lugar_aleatorio_x, lugar_aleatorio_y])
+            self.comida.append(pygame.draw.circle(self.tela, self.player_cor, self.lugares_aletorios[c], 10))
+
+
+    def manter_massas(self, x):
+        for c in range(x):
+            self.comida[c] = pygame.draw.circle(self.tela, self.player_cor, self.lugares_aletorios[c], 10)
+
+    # def levels():
+    #     if self.player_massa > 700:
+
+if __name__ == "__main__":
+    jogo()
