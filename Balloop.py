@@ -1,11 +1,12 @@
 import pygame
 import random
 import Transicions
-from time import sleep
+import math
 from pygame.locals import *
 from sys import exit
 
 class Jogo:
+
     def __init__(self):
         clock = pygame.time.Clock()
 
@@ -32,7 +33,7 @@ class Jogo:
 
         self.criar_massas(20)
 
-        while True:
+        while True: 
             for event in pygame.event.get():
                 if event.type == QUIT:
                     pygame.quit()
@@ -49,6 +50,7 @@ class Jogo:
                 self.player = pygame.draw.circle(self.tela, self.player_cor, self.player_pos, self.player_massa)   
             except:
                 pass
+
             keys = pygame.key.get_pressed()
             if keys[pygame.K_w]:
                 self.player_pos.y -= self.player_velocidade * dt
@@ -62,88 +64,6 @@ class Jogo:
             self.pontos_por_comida = 5
 
             self.colisao()
-            
-            # if self.player.collideobjectsall(self.comida):
-            #     if self.player.colliderect(self.comida[19]):
-            #         del self.comida[19]
-            #         del self.lugares_aletorios[19]
-            #         self.player_massa += self.pontos_por_comida
-            #     if self.player.colliderect(self.comida[18]):
-            #         del self.comida[18]
-            #         del self.lugares_aletorios[18]
-            #         self.player_massa += self.pontos_por_comida
-            #     if self.player.colliderect(self.comida[17]):
-            #         del self.comida[17]
-            #         del self.lugares_aletorios[17]
-            #         self.player_massa += self.pontos_por_comida
-            #     if self.player.colliderect(self.comida[16]):
-            #         del self.comida[16]
-            #         del self.lugares_aletorios[16]
-            #         self.player_massa += self.pontos_por_comida
-            #     if self.player.colliderect(self.comida[15]):
-            #         del self.comida[15]
-            #         del self.lugares_aletorios[15]
-            #         self.player_massa += self.pontos_por_comida
-            #     if self.player.colliderect(self.comida[14]):
-            #         del self.comida[14]
-            #         del self.lugares_aletorios[14]
-            #         self.player_massa += self.pontos_por_comida
-            #     if self.player.colliderect(self.comida[13]):
-            #         del self.comida[13]
-            #         del self.lugares_aletorios[13]
-            #         self.player_massa += self.pontos_por_comida
-            #     if self.player.colliderect(self.comida[12]):
-            #         del self.comida[12]
-            #         del self.lugares_aletorios[12]
-            #         self.player_massa += self.pontos_por_comida
-            #     if self.player.colliderect(self.comida[11]):
-            #         del self.comida[11]
-            #         del self.lugares_aletorios[11]
-            #         self.player_massa += self.pontos_por_comida
-            #     if self.player.colliderect(self.comida[10]):
-            #         del self.comida[10]
-            #         del self.lugares_aletorios[10]
-            #     if self.player.colliderect(self.comida[9]):
-            #         del self.comida[9]
-            #         del self.lugares_aletorios[9]
-            #         self.player_massa += self.pontos_por_comida
-            #     if self.player.colliderect(self.comida[8]):
-            #         del self.comida[8]
-            #         del self.lugares_aletorios[8]
-            #         self.player_massa += self.pontos_por_comida
-            #     if self.player.colliderect(self.comida[7]):
-            #         del self.comida[7]
-            #         del self.lugares_aletorios[7]
-            #         self.player_massa += self.pontos_por_comida
-            #     if self.player.colliderect(self.comida[6]):
-            #         del self.comida[6]
-            #         del self.lugares_aletorios[6]
-            #         self.player_massa += self.pontos_por_comida
-            #     if self.player.colliderect(self.comida[5]):
-            #         del self.comida[5]
-            #         del self.lugares_aletorios[5]
-            #         self.player_massa += self.pontos_por_comida
-            #     if self.player.colliderect(self.comida[4]):
-            #         del self.comida[4]
-            #         del self.lugares_aletorios[4]
-            #         self.player_massa += self.pontos_por_comida
-            #     if self.player.colliderect(self.comida[3]):
-            #         del self.comida[3]
-            #         del self.lugares_aletorios[3]
-            #         self.player_massa += self.pontos_por_comida
-            #     if self.player.colliderect(self.comida[2]):
-            #         del self.comida[2]
-            #         del self.lugares_aletorios[2]
-            #         self.player_massa += self.pontos_por_comida
-            #     if self.player.colliderect(self.comida[1]):
-            #         del self.comida[1]
-            #         del self.lugares_aletorios[1]
-            #         self.player_massa += self.pontos_por_comida
-            #     if self.player.colliderect(self.comida[0]):
-            #         del self.comida[0]
-            #         del self.lugares_aletorios[0]
-            #         self.player_massa += self.pontos_por_comida
-
             
             if self.player_massa > 400:
                 self.pontos_por_comida = 1
@@ -160,7 +80,7 @@ class Jogo:
                             break
             except:
                 pass
-            
+
             if self.player_massa > 100 and self.player_massa < 200:
                 self.player_velocidade = 200
                 self.pontos_por_comida = 0.1
@@ -171,7 +91,7 @@ class Jogo:
             pygame.display.flip()
 
             dt = clock.tick(60) / 1000
-        
+
     def criar_massas(self, x):
         for c in range(x):
             lugar_aleatorio_x = random.randrange(1, 1080)
@@ -185,13 +105,26 @@ class Jogo:
         for c in range(x):
             self.comida[c] = pygame.draw.circle(self.tela, self.player_cor, self.lugares_aletorios[c], self.massa_comida)
     
+    def verificar_colisao(self, circulo1, circulo2):
+        x1, y1, raio1 = circulo1
+        x2, y2, raio2 = circulo2
+
+        # Calcula a distância entre os centros dos círculos
+        distancia = math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2)
+
+        # Verifica se há colisão
+        if distancia <= raio1 + raio2:
+            return True
+        else:
+            return False
+    
     def colisao(self):
-        if self.player.collideobjectsall(self.comida):
-            for c in range(len(self.comida)):
-                if self.player.colliderect(self.comida[c]):
-                    del self.comida[c]
-                    del self.lugares_aletorios[c]
-                    self.criar_massas(1)
+        for c, comida in enumerate(self.comida):
+            if self.verificar_colisao((self.player_pos.x, self.player_pos.y, self.player_massa), (comida[0], comida[1], comida[2])):
+                del self.comida[c]
+                del self.lugares_aletorios[c]
+                self.player_massa += self.pontos_por_comida
+                self.criar_massas(1)
                     
 
 if __name__ == "__main__":
