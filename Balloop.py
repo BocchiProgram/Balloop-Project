@@ -10,7 +10,7 @@ class jogo:
         clock = pygame.time.Clock()
 
         pygame.init()
-        self.contador = 1
+        self.contador = 0
         largura = 1080
         altura = 650
         dt = 0
@@ -58,8 +58,9 @@ class jogo:
             if keys[pygame.K_s]:
                 self.player_pos.y += 200 * dt
 
-            self.pontos_por_comida = 5
+            self.pontos_por_comida = 400
 
+            # Verfica a colisão uma de cada vez
             try:
                 if self.player.collideobjectsall(self.comida):
                     if self.player.colliderect(self.comida[4]):
@@ -85,6 +86,7 @@ class jogo:
             except:
                 pass
             
+            #dificulta o jogo quando a massa chega a mais de 400
             if self.player_massa > 400:
                 self.pontos_por_comida = 1
             try:
@@ -92,7 +94,11 @@ class jogo:
                     self.player_massa = 20
                     self.contador += 1
                     self.fundo_cor = Transicions.Trans.backgroud_color(self.contador)
-                    self.player_cor = Transicions.Trans.player_color(self.contador)
+                    # verifica se a cor de fundo é igual a do player, caso seja, fica em um loop até não ser mais
+                    while True:
+                        self.player_cor = Transicions.Trans.player_color(self.contador) 
+                        if self.player_cor != self.fundo_cor:
+                            break
             except:
                 pass
             
@@ -100,16 +106,16 @@ class jogo:
 
             dt = clock.tick(60) / 1000
     
+    #cria massas
     def criar_massas(self, x):
         for c in range(x):
             lugar_aleatorio_x = random.randrange(1, 1080)
             lugar_aleatorio_y = random.randrange(1, 650)
 
-            # lugares_aletorios = [lugar_aleatorio_x, lugar_aleatorio_y]
             self.lugares_aletorios.append([lugar_aleatorio_x, lugar_aleatorio_y])
             self.comida.append(pygame.draw.circle(self.tela, self.player_cor, self.lugares_aletorios[c], 10))
 
-
+    #mantem as massas visiveis
     def manter_massas(self, x):
         for c in range(x):
             self.comida[c] = pygame.draw.circle(self.tela, self.player_cor, self.lugares_aletorios[c], 10)
