@@ -1,5 +1,5 @@
 import random
-cores = ['black', 'red'], ['red', 'black'], ['black', 'green'], ['green', 'black'], ['black', 'pink'], ['pink', 'black'],['black', 'yellow'], ['yellow', 'black']
+cores = ['black', 'blue'], ['blue', 'black'], ['black', 'green'], ['green', 'black'], ['black', 'pink'], ['pink', 'black'],['black', 'yellow'], ['yellow', 'black']
 
 class Trans:
     # def init(self, x):

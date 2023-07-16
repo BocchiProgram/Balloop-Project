@@ -31,7 +31,13 @@ class Jogo:
         self.player_cor = Transicions.Trans.player_color(self.contador)
         self.player_velocidade = 235
 
-        
+        self.inimigo_pos = pygame.Vector2(self.tela.get_width() / 2, self.tela.get_height() / 2)
+        self.inimigo_cor = 'red'
+        self.inimigo_massa = 15
+        self.inimigo_x = largura
+        self.inimigo_y = altura
+        self.velocidade_x, self.velocidade_y = 3, 2
+
         self.comida = []
         self.pontos_por_comida = 5
         self.massa_comida = 5
@@ -55,6 +61,16 @@ class Jogo:
             
             #player 
             self.player = pygame.draw.circle(self.tela, self.player_cor, self.player_pos, self.player_massa)   
+            self.inimigo = pygame.draw.circle(self.tela, self.inimigo_cor, self.inimigo_pos, self.inimigo_massa)
+
+            self.inimigo_pos.x += self.velocidade_x 
+            self.inimigo_pos.y += self.velocidade_y 
+
+            if self.inimigo_pos.x <= 0 or self.inimigo_pos.x >= 1080:
+                self.velocidade_x *= -1
+
+            if self.inimigo_pos.y <= 0 or self.inimigo_pos.y >= 650:
+                self.velocidade_y *= -1
 
             keys = pygame.key.get_pressed()
             if keys[pygame.K_w]:
