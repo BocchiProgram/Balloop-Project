@@ -30,8 +30,6 @@ class Jogo:
         self.player_cor = Transicions.Trans.player_color(self.contador)
         self.player_velocidade = 235
 
-        self.numero_random_inimigo_y = random.randrange(0, 600)
-        self.inimigo_pos = pygame.Vector2(0, self.numero_random_inimigo_y)
         self.inimigo_cor = 'red'
         self.inimigo_massa = 15
         self.inimigo_x = largura
@@ -55,24 +53,26 @@ class Jogo:
 
             for event in pygame.event.get():
                 if event.type == QUIT:
+                    print(self.lugares_aleatorios_inimigos)
                     pygame.quit()
                     exit()
 
             self.tela.fill(self.fundo_cor)
             self.manter_massas(20)
-            self.manter_inimigos(5)
+            self.manter_inimigos(len(self.inimigos))
             
             #player 
             self.player = pygame.draw.circle(self.tela, self.player_cor, self.player_pos, self.player_massa)   
 
-            self.inimigo_pos.x += self.velocidade_x 
-            self.inimigo_pos.y += self.velocidade_y 
+            for c in range(len(self.lugares_aleatorios_inimigos)):
+                self.lugares_aleatorios_inimigos[c][0] += self.velocidade_x 
+                self.lugares_aleatorios_inimigos[c][1] += self.velocidade_y
             
-            if self.inimigo_pos.x <= 0 or self.inimigo_pos.x >= 1080:
-                self.velocidade_x *= -1
+                if self.lugares_aleatorios_inimigos[c][0] <= 0 or self.lugares_aleatorios_inimigos[c][0] >= 1080:
+                    self.velocidade_x *= -1
 
-            if self.inimigo_pos.y <= 0 or self.inimigo_pos.y >= 650:
-                self.velocidade_y *= -1
+                if self.lugares_aleatorios_inimigos[c][1] <= 0 or self.lugares_aleatorios_inimigos[c][1] >= 650:
+                    self.velocidade_y *= -1
 
             keys = pygame.key.get_pressed()
             if keys[pygame.K_w]:
@@ -84,7 +84,8 @@ class Jogo:
             if keys[pygame.K_s]:
                 self.player_pos.y += self.player_velocidade * dt
 
-            self.colisao()
+            self.colisao_comida()
+            self.colisao_inimigo()
             
             if self.player_massa > 1500:
                 self.player_velocidade = 235
@@ -120,8 +121,8 @@ class Jogo:
 
     def criar_inimigos(self, x):
         for c in range(x):
-            self.numero_random_inimigo_y = random.randrange(0, 600)
-            self.numero_random_inimigo_x = random.randrange(0, 1)
+            self.numero_random_inimigo_x = random.randrange(0, 1080)
+            self.numero_random_inimigo_y = random.randrange(0, 650)
 
             self.lugares_aleatorios_inimigos.append([self.numero_random_inimigo_y, self.numero_random_inimigo_x])
             self.inimigos.append(pygame.draw.circle(self.tela, self.inimigo_cor, self.lugares_aleatorios_inimigos[c], self.inimigo_massa))   
@@ -147,7 +148,7 @@ class Jogo:
         else:
             return False
 
-    def colisao(self):
+    def colisao_comida(self):
         for c, comida in enumerate(self.comida):
             if self.verificar_colisao((self.player_pos.x, self.player_pos.y, self.player_massa), (comida[0], comida[1], comida[2])):
                 del self.comida[c]
@@ -158,5 +159,14 @@ class Jogo:
                     
         self.tela.blit(self.texto_formatado, (10, 10))
 
+    def colisao_inimigo(self):
+        for c, inimigo in enumerate(self.inimigos):
+            if self.verificar_colisao((self.player_pos.x, self.player_pos.y, self.player_massa), (inimigo[0], inimigo[1], inimigo[2])):
+                del self.inimigos[c]
+                del self.lugares_aleatorios_inimigos[c]
+                self.player_massa += self.pontos_por_comida
+                self.pontos += 10
+                    
+        self.tela.blit(self.texto_formatado, (10, 10))
 if __name__ == "__main__":
     Jogo()
