@@ -23,15 +23,15 @@ class Jogo:
 
         self.tela = pygame.display.set_mode((largura, altura))
         self.fundo_cor = Transicions.Trans.backgroud_color(self.contador)
-        self.fonte = pygame.font.SysFont('arial', 40, True, True)
-        
+        self.fonte = pygame.font.SysFont('arial', 40, True, True)        
 
         self.player_pos = pygame.Vector2(self.tela.get_width() / 2, self.tela.get_height() / 2)
         self.player_massa = 20
         self.player_cor = Transicions.Trans.player_color(self.contador)
         self.player_velocidade = 235
 
-        self.inimigo_pos = pygame.Vector2(self.tela.get_width() / 2, self.tela.get_height() / 2)
+        self.numero_random_inimigo_y = random.randrange(0, 600)
+        self.inimigo_pos = pygame.Vector2(0, self.numero_random_inimigo_y)
         self.inimigo_cor = 'red'
         self.inimigo_massa = 15
         self.inimigo_x = largura
@@ -43,11 +43,13 @@ class Jogo:
         self.massa_comida = 5
         self.lugares_aletorios = []
         
+        self.inimigos = []
+        self.lugares_aleatorios_inimigos = []
+
         self.criar_massas(20)
-   
+        self.criar_inimigos(5)
 
         while True: 
-
             self.mensagem = f'Pontos: {self.pontos}'
             self.texto_formatado = self.fonte.render(self.mensagem, True, (255, 255, 255))
 
@@ -58,14 +60,14 @@ class Jogo:
 
             self.tela.fill(self.fundo_cor)
             self.manter_massas(20)
+            self.manter_inimigos(5)
             
             #player 
             self.player = pygame.draw.circle(self.tela, self.player_cor, self.player_pos, self.player_massa)   
-            self.inimigo = pygame.draw.circle(self.tela, self.inimigo_cor, self.inimigo_pos, self.inimigo_massa)
 
             self.inimigo_pos.x += self.velocidade_x 
             self.inimigo_pos.y += self.velocidade_y 
-
+            
             if self.inimigo_pos.x <= 0 or self.inimigo_pos.x >= 1080:
                 self.velocidade_x *= -1
 
@@ -116,10 +118,22 @@ class Jogo:
             self.lugares_aletorios.append([lugar_aleatorio_x, lugar_aleatorio_y])
             self.comida.append(pygame.draw.circle(self.tela, self.player_cor, self.lugares_aletorios[c], self.massa_comida))
 
+    def criar_inimigos(self, x):
+        for c in range(x):
+            self.numero_random_inimigo_y = random.randrange(0, 600)
+            self.numero_random_inimigo_x = random.randrange(0, 1)
+
+            self.lugares_aleatorios_inimigos.append([self.numero_random_inimigo_y, self.numero_random_inimigo_x])
+            self.inimigos.append(pygame.draw.circle(self.tela, self.inimigo_cor, self.lugares_aleatorios_inimigos[c], self.inimigo_massa))   
+
     def manter_massas(self, x):
         for c in range(x):
             self.comida[c] = pygame.draw.circle(self.tela, self.player_cor, self.lugares_aletorios[c], self.massa_comida)
     
+    def manter_inimigos(self, x):
+        for c in range(x):
+            self.inimigos[c] = pygame.draw.circle(self.tela, self.inimigo_cor, self.lugares_aleatorios_inimigos[c], self.inimigo_massa)
+
     def verificar_colisao(self, circulo1, circulo2):
         x1, y1, raio1 = circulo1
         x2, y2, raio2 = circulo2
