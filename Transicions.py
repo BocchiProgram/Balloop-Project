@@ -7,10 +7,10 @@ class Trans:
     #
     def backgroud_color(x):
         if x > len(cores): # caso acabe as programadas, começa a gerar cores aleatórias!
-            x = random.randrange(len(cores))    
-        return cores[x][0]
+            x = random.randrange(len(cores))  
+        return cores[x - 1][0]
 
     def player_color(x):
         if x > len(cores): # caso acabe as programadas, começa a gerar cores aleatórias!
             x = random.randrange(len(cores))    
-        return cores[x][1]
+        return cores[x - 1][1]

@@ -28,14 +28,15 @@ class Jogo:
         self.player_pos = pygame.Vector2(self.tela.get_width() / 2, self.tela.get_height() / 2)
         self.player_massa = 20
         self.player_cor = Transicions.Trans.player_color(self.contador)
-        self.player_velocidade = 235
-
+        self.player_velocidade = 320
+    
         self.inimigo_cor = 'red'
         self.inimigo_massa = 15
         self.inimigo_x = largura
         self.inimigo_y = altura
-        self.velocidade_x, self.velocidade_y = 3, 2
-
+        self.velocidade_x = []
+        self.velocidade_y = []
+        
         self.comida = []
         self.pontos_por_comida = 5
         self.massa_comida = 5
@@ -45,7 +46,7 @@ class Jogo:
         self.lugares_aleatorios_inimigos = []
 
         self.criar_massas(20)
-        self.criar_inimigos(5)
+        self.criar_inimigos(1)
 
         while True: 
             self.mensagem = f'Pontos: {self.pontos}'
@@ -53,7 +54,6 @@ class Jogo:
 
             for event in pygame.event.get():
                 if event.type == QUIT:
-                    print(self.lugares_aleatorios_inimigos)
                     pygame.quit()
                     exit()
 
@@ -65,14 +65,14 @@ class Jogo:
             self.player = pygame.draw.circle(self.tela, self.player_cor, self.player_pos, self.player_massa)   
 
             for c in range(len(self.lugares_aleatorios_inimigos)):
-                self.lugares_aleatorios_inimigos[c][0] += self.velocidade_x 
-                self.lugares_aleatorios_inimigos[c][1] += self.velocidade_y
+                self.lugares_aleatorios_inimigos[c][0] += self.velocidade_x[c] 
+                self.lugares_aleatorios_inimigos[c][1] += self.velocidade_y[c]
             
                 if self.lugares_aleatorios_inimigos[c][0] <= 0 or self.lugares_aleatorios_inimigos[c][0] >= 1080:
-                    self.velocidade_x *= -1
+                    self.velocidade_x[c] *= -1
 
                 if self.lugares_aleatorios_inimigos[c][1] <= 0 or self.lugares_aleatorios_inimigos[c][1] >= 650:
-                    self.velocidade_y *= -1
+                    self.velocidade_y[c] *= -1
 
             keys = pygame.key.get_pressed()
             if keys[pygame.K_w]:
@@ -88,11 +88,12 @@ class Jogo:
             self.colisao_inimigo()
             
             if self.player_massa > 1500:
-                self.player_velocidade = 235
+                self.player_velocidade = 320
                 self.massa_comida = 5
                 self.player_massa = 20
                 self.contador += 1
                 self.pontos_por_comida = 5
+                self.criar_inimigos(self.contador)
                 self.fundo_cor = Transicions.Trans.backgroud_color(self.contador)
                 while True:
                     self.player_cor = Transicions.Trans.player_color(self.contador) 
@@ -100,10 +101,10 @@ class Jogo:
                         break
 
             if self.player_massa > 100 and self.player_massa < 200:
-                self.player_velocidade = 200
+                self.player_velocidade = 355
                 self.pontos_por_comida = 4
             if self.player_massa > 300:
-                self.player_velocidade = 250
+                self.player_velocidade = 355
                 self.pontos_por_comida = 3
 
             pygame.display.flip()
@@ -115,7 +116,6 @@ class Jogo:
             lugar_aleatorio_x = random.randrange(1, 1080)
             lugar_aleatorio_y = random.randrange(1, 650)
 
-            # lugares_aletorios = [lugar_aleatorio_x, lugar_aleatorio_y]
             self.lugares_aletorios.append([lugar_aleatorio_x, lugar_aleatorio_y])
             self.comida.append(pygame.draw.circle(self.tela, self.player_cor, self.lugares_aletorios[c], self.massa_comida))
 
@@ -124,8 +124,11 @@ class Jogo:
             self.numero_random_inimigo_x = random.randrange(0, 1080)
             self.numero_random_inimigo_y = random.randrange(0, 650)
 
-            self.lugares_aleatorios_inimigos.append([self.numero_random_inimigo_y, self.numero_random_inimigo_x])
-            self.inimigos.append(pygame.draw.circle(self.tela, self.inimigo_cor, self.lugares_aleatorios_inimigos[c], self.inimigo_massa))   
+            self.velocidade_x.append(c + 3)
+            self.velocidade_y.append(c + 2)
+                
+            self.lugares_aleatorios_inimigos.append([self.numero_random_inimigo_x, self.numero_random_inimigo_y])
+            self.inimigos.append(pygame.draw.circle(self.tela, self.inimigo_cor, self.lugares_aleatorios_inimigos[c], self.inimigo_massa))
 
     def manter_massas(self, x):
         for c in range(x):
@@ -164,6 +167,8 @@ class Jogo:
             if self.verificar_colisao((self.player_pos.x, self.player_pos.y, self.player_massa), (inimigo[0], inimigo[1], inimigo[2])):
                 del self.inimigos[c]
                 del self.lugares_aleatorios_inimigos[c]
+                del self.velocidade_x[c]
+                del self.velocidade_y[c]
                 self.player_massa += self.pontos_por_comida
                 self.pontos += 10
                     
