@@ -14,3 +14,9 @@ class Trans:
         if x > len(cores): # caso acabe as programadas, começa a gerar cores aleatórias!
             x = random.randrange(len(cores))    
         return cores[x - 1][1]
+
+    def invuneravel(x):
+        if x is 'black':
+            return 'white'
+        else:
+            return 'grey'
