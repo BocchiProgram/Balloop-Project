@@ -2,13 +2,17 @@ import pygame
 import random
 import Transicions
 import math
+from time import sleep
 from pygame.locals import *
 from sys import exit
 
 class Jogo:
-
     def __init__(self):
         clock = pygame.time.Clock()
+
+        self.timer = 0
+        self.timer_cor = 0
+        self.timer_cor1 = 0
 
         pygame.init()
         pygame.display.set_caption('Regular Game')
@@ -31,7 +35,7 @@ class Jogo:
         self.player_velocidade = 320
     
         self.inimigo_cor = 'red'
-        self.inimigo_massa = 15
+        self.inimigo_massa = 8
         self.inimigo_x = largura
         self.inimigo_y = altura
         self.velocidade_x = []
@@ -74,20 +78,36 @@ class Jogo:
                 if self.lugares_aleatorios_inimigos[c][1] <= 0 or self.lugares_aleatorios_inimigos[c][1] >= 650:
                     self.velocidade_y[c] *= -1
 
-            keys = pygame.key.get_pressed()
-            if keys[pygame.K_w]:
+            self.keys = pygame.key.get_pressed()
+            if self.keys[pygame.K_w]:
                 self.player_pos.y -= self.player_velocidade * dt
-            if keys[pygame.K_d]:
+            if self.keys[pygame.K_d]:
                 self.player_pos.x += self.player_velocidade * dt
-            if keys[pygame.K_a]:
+            if self.keys[pygame.K_a]:
                 self.player_pos.x -= self.player_velocidade * dt
-            if keys[pygame.K_s]:
+            if self.keys[pygame.K_s]:
                 self.player_pos.y += self.player_velocidade * dt
 
+            self.timer += 1
+
             self.colisao_comida()
-            self.colisao_inimigo()
+            if self.timer > 100:
+                self.colisao_inimigo()
+                self.player_cor = Transicions.Trans.player_color(self.contador)
+            else:
+                if self.timer_cor1 == 10:
+                    self.timer_cor1 = 0
+                    self.player_cor = 'orange'
+                elif self.timer_cor1 == 0:
+                    self.player_cor = Transicions.Trans.player_color(self.contador)
+            
+            self.timer_cor1 += 1
             
             if self.player_massa > 1500:
+                self.timer_cor1 = 0
+                self.timer_cor = 0
+                self.timer = 0
+                self.inimigo_cor = 'red'
                 self.player_velocidade = 320
                 self.massa_comida = 5
                 self.player_massa = 20
@@ -102,11 +122,14 @@ class Jogo:
 
             if self.player_massa > 100 and self.player_massa < 200:
                 self.player_velocidade = 355
-                self.pontos_por_comida = 4
-            if self.player_massa > 300:
+                self.pontos_por_comida = 8
+            if self.player_massa > 400:
                 self.player_velocidade = 355
                 self.pontos_por_comida = 3
 
+            if self.player_massa > 80:
+                self.inimigo_cor = self.player_cor
+                
             pygame.display.flip()
 
             dt = clock.tick(60) / 1000
@@ -124,8 +147,8 @@ class Jogo:
             self.numero_random_inimigo_x = random.randrange(0, 1080)
             self.numero_random_inimigo_y = random.randrange(0, 650)
 
-            self.velocidade_x.append(c + 3)
-            self.velocidade_y.append(c + 2)
+            self.velocidade_x.append(c - 0.5)
+            self.velocidade_y.append(c - 0.5)
                 
             self.lugares_aleatorios_inimigos.append([self.numero_random_inimigo_x, self.numero_random_inimigo_y])
             self.inimigos.append(pygame.draw.circle(self.tela, self.inimigo_cor, self.lugares_aleatorios_inimigos[c], self.inimigo_massa))
@@ -165,13 +188,56 @@ class Jogo:
     def colisao_inimigo(self):
         for c, inimigo in enumerate(self.inimigos):
             if self.verificar_colisao((self.player_pos.x, self.player_pos.y, self.player_massa), (inimigo[0], inimigo[1], inimigo[2])):
-                del self.inimigos[c]
-                del self.lugares_aleatorios_inimigos[c]
-                del self.velocidade_x[c]
-                del self.velocidade_y[c]
+                if self.player_massa > 80:
+                    del self.inimigos[c]
+                    del self.lugares_aleatorios_inimigos[c]
+                    del self.velocidade_x[c]
+                    del self.velocidade_y[c]
+                else:
+                    Game_over()
                 self.player_massa += self.pontos_por_comida
                 self.pontos += 10
                     
         self.tela.blit(self.texto_formatado, (10, 10))
+    
+class Game_over:
+    def __init__(self):
+        pygame.init()
+        pygame.display.set_caption('Regular Game')
+
+        largura = 1080
+        altura = 650
+
+        #Contador de levels e pontos
+        pontos = 0 #Conta pontos
+        contador = 1 #Conta levels
+
+        self.tela = pygame.display.set_mode((largura, altura))
+        self.fundo_cor = Transicions.Trans.backgroud_color(contador)
+        self.fonte = pygame.font.SysFont('arial', 40, True, True)   
+        while True:
+            for event in pygame.event.get():
+                if event.type == QUIT:
+                    pygame.quit()
+                    exit()
+
+            keys = pygame.key.get_pressed()
+            if not keys[pygame.K_SPACE]:
+                self.tela.fill((0, 0, 0))  # Preenche a tela com a cor preta
+                fonte_game_over = pygame.font.SysFont('arial', 80, True, True)
+                mensagem_game_over = fonte_game_over.render('Game Over', True, (255, 255, 255))
+                self.tela.blit(mensagem_game_over, (self.tela.get_width() // 2 - mensagem_game_over.get_width() // 2, self.tela.get_height() // 2 - mensagem_game_over.get_height() // 2))
+                pygame.display.flip()
+                pygame.display.flip()
+            else:
+                Jogo()
+
+class Tempo:
+    def __init__(self):
+        while True:
+            return print(sleep(1))
+
+        pass 
+
 if __name__ == "__main__":
     Jogo()
