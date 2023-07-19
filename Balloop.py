@@ -34,6 +34,11 @@ class Jogo:
         self.player_cor_number = 0
         self.player_velocidade = 320
     
+        while True:
+            self.player_cor[0] = Transicions.Trans.player_color(self.contador) 
+            if self.player_cor[0] != self.fundo_cor:
+                break
+
         self.inimigo_cor = 'red'
         self.inimigo_massa = 8
         self.inimigo_x = largura
@@ -50,7 +55,7 @@ class Jogo:
         self.lugares_aleatorios_inimigos = []
 
         self.criar_massas(20)
-        self.criar_inimigos(1)
+        self.criar_inimigos(self.contador)
 
         while True: 
             self.mensagem = f'Pontos: {self.pontos}'
@@ -100,7 +105,7 @@ class Jogo:
                 self.colisao_inimigo()
                 self.player_cor_number = 0
             else:
-                if self.timer_tempo_real % 2:
+                if self.timer_tempo < 27.5:
                     self.player_cor_number = 1
                 else:
                     self.player_cor_number = 0 
@@ -120,12 +125,12 @@ class Jogo:
                     if self.player_cor[0] != self.fundo_cor:
                         break
 
-            if self.player_massa > 100 and self.player_massa < 200:
-                self.player_velocidade = 355
-                self.pontos_por_comida = 8
-            if self.player_massa > 400:
-                self.player_velocidade = 355
-                self.pontos_por_comida = 3
+            # if self.player_massa > 100 and self.player_massa < 200:
+            #     self.player_velocidade = 355
+            #     self.pontos_por_comida = 8
+            # if self.player_massa > 400:
+            #     self.player_velocidade = 355
+            #     self.pontos_por_comida = 3
 
             if self.player_massa > 80:
                 self.inimigo_cor = self.player_cor[0]
