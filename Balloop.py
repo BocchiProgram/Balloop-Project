@@ -47,7 +47,7 @@ class Jogo:
         self.velocidade_y = []
         
         self.comida = []
-        self.pontos_por_comida = 5
+        self.pontos_por_comida = 2
         self.massa_comida = 5
         self.lugares_aletorios = []
         
@@ -117,7 +117,7 @@ class Jogo:
                 self.massa_comida = 5
                 self.player_massa = 20
                 self.contador += 1
-                self.pontos_por_comida = 5
+                self.pontos_por_comida = 2
                 self.criar_inimigos(self.contador)
                 self.fundo_cor = Transicions.Trans.backgroud_color(self.contador)
                 while True:
@@ -125,14 +125,15 @@ class Jogo:
                     if self.player_cor[0] != self.fundo_cor:
                         break
 
-            # if self.player_massa > 100 and self.player_massa < 200:
-            #     self.player_velocidade = 355
-            #     self.pontos_por_comida = 8
-            # if self.player_massa > 400:
-            #     self.player_velocidade = 355
-            #     self.pontos_por_comida = 3
+            if self.player_massa > 100 and self.player_massa < 200:
+                self.player_velocidade = 355
+                self.pontos_por_comida = 8
+            if self.player_massa > 400:
+                self.player_velocidade = 355
+                self.pontos_por_comida = 3
 
-            if self.player_massa > 80:
+            if self.player_massa > 38:
+                self.pontos_por_comida = 8
                 self.inimigo_cor = self.player_cor[0]
                 
             pygame.display.flip()
@@ -193,7 +194,7 @@ class Jogo:
     def colisao_inimigo(self):
         for c, inimigo in enumerate(self.inimigos):
             if self.verificar_colisao((self.player_pos.x, self.player_pos.y, self.player_massa), (inimigo[0], inimigo[1], inimigo[2])):
-                if self.player_massa > 80:
+                if self.player_massa >38:
                     del self.inimigos[c]
                     del self.lugares_aleatorios_inimigos[c]
                     del self.velocidade_x[c]
