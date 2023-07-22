@@ -176,10 +176,10 @@ class Jogo_Hardcore:
 
             if self.player_massa > 100 and self.player_massa < 200:
                 self.player_velocidade = 355
-                self.pontos_por_comida = 15
+                self.pontos_por_comida = 10
             if self.player_massa > 400:
                 self.player_velocidade = 355
-                self.pontos_por_comida = 2
+                self.pontos_por_comida = 5
 
             if self.player_massa > 38:
                 self.pontos_por_comida = 15
@@ -277,7 +277,7 @@ class Jogo_Pacifico:
                 break
         
         self.comida = []
-        self.pontos_por_comida = 2
+        self.pontos_por_comida = 5
         self.massa_comida = 5
         self.lugares_aletorios = []
 
@@ -316,7 +316,7 @@ class Jogo_Pacifico:
                 self.massa_comida = 5
                 self.player_massa = 20
                 self.contador += 1
-                self.pontos_por_comida = 2
+                self.pontos_por_comida = 5
                 self.fundo_cor = Transicions.Trans.backgroud_color(self.contador)
                 while True:
                     self.player_cor[0] = Transicions.Trans.player_color(self.contador) 
@@ -325,13 +325,13 @@ class Jogo_Pacifico:
 
             if self.player_massa > 100 and self.player_massa < 200:
                 self.player_velocidade = 355
-                self.pontos_por_comida = 8
+                self.pontos_por_comida = 10
             if self.player_massa > 400:
                 self.player_velocidade = 355
                 self.pontos_por_comida = 3
 
             if self.player_massa > 38:
-                self.pontos_por_comida = 8
+                self.pontos_por_comida = 5
                 self.inimigo_cor = self.player_cor[0]
                 
             pygame.display.flip()
