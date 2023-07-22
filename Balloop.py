@@ -71,6 +71,12 @@ class Start:
         
         if texto_rect2.colliderect(jogador_rect2):
                 Jogo_Pacifico()
+        
+        texto_rect3 = self.texto_formatado3.get_rect(topleft=(420, 150))
+        jogador_rect3 = pygame.Rect(self.player_pos.x - self.player_massa, self.player_pos.y - self.player_massa, self.player_massa * 2, self.player_massa * 2)
+        
+        if texto_rect3.colliderect(jogador_rect3):
+                Jogo_Pacifico()
                     
 class Jogo_Hardcore:
     def __init__(self):
