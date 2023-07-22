@@ -10,9 +10,8 @@ class Jogo:
     def __init__(self):
         clock = pygame.time.Clock()
 
-        self.timer = 0
-        self.timer_cor = 0
-        self.timer_cor1 = 0
+        self.timer_tempo = 0
+        self.timer_tempo_real = 0
 
         pygame.init()
         pygame.display.set_caption('Regular Game')
@@ -31,7 +30,8 @@ class Jogo:
 
         self.player_pos = pygame.Vector2(self.tela.get_width() / 2, self.tela.get_height() / 2)
         self.player_massa = 20
-        self.player_cor = Transicions.Trans.player_color(self.contador)
+        self.player_cor = [Transicions.Trans.player_color(self.contador), 'orange']
+        self.player_cor_number = 0
         self.player_velocidade = 320
     
         while True:
@@ -71,7 +71,7 @@ class Jogo:
             self.manter_inimigos(len(self.inimigos))
             
             #player 
-            self.player = pygame.draw.circle(self.tela, self.player_cor, self.player_pos, self.player_massa)   
+            self.player = pygame.draw.circle(self.tela, self.player_cor[self.player_cor_number], self.player_pos, self.player_massa)   
 
             for c in range(len(self.lugares_aleatorios_inimigos)):
                 self.lugares_aleatorios_inimigos[c][0] += self.velocidade_x[c] 
@@ -93,32 +93,25 @@ class Jogo:
             if self.keys[pygame.K_s]:
                 self.player_pos.y += self.player_velocidade * dt
 
-            self.timer += 1
+            self.timer_tempo += 1
+            if self.timer_tempo == 57:
+                self.timer_tempo_real += 1
+                self.timer_tempo = 0
+
+            print(self.timer_tempo_real)
 
             self.colisao_comida()
-            if self.timer > 100:
+            if self.timer_tempo_real > 3:
                 self.colisao_inimigo()
-                self.player_cor = Transicions.Trans.player_color(self.contador)
+                self.player_cor_number = 0
             else:
-
-                if self.timer_cor1 == 10:
-                    self.timer_cor1 = 0
-                    self.player_cor = 'orange'
-                elif self.timer_cor1 == 0:
-                    self.player_cor = Transicions.Trans.player_color(self.contador)
-            
-            self.timer_cor1 += 1
-
-            if self.timer_tempo < 27.5:
-                self.player_cor_number = 1
-            else:
-                self.player_cor_number = 0 
-
+                if self.timer_tempo < 27.5:
+                    self.player_cor_number = 1
+                else:
+                    self.player_cor_number = 0 
             
             if self.player_massa > 1500:
-                self.timer_cor1 = 0
-                self.timer_cor = 0
-                self.timer = 0
+                self.timer_tempo_real = 0
                 self.inimigo_cor = 'red'
                 self.player_velocidade = 320
                 self.massa_comida = 5
@@ -128,8 +121,8 @@ class Jogo:
                 self.criar_inimigos(self.contador)
                 self.fundo_cor = Transicions.Trans.backgroud_color(self.contador)
                 while True:
-                    self.player_cor = Transicions.Trans.player_color(self.contador) 
-                    if self.player_cor != self.fundo_cor:
+                    self.player_cor[0] = Transicions.Trans.player_color(self.contador) 
+                    if self.player_cor[0] != self.fundo_cor:
                         break
 
             if self.player_massa > 100 and self.player_massa < 200:
@@ -139,14 +132,9 @@ class Jogo:
                 self.player_velocidade = 355
                 self.pontos_por_comida = 3
 
-
-            if self.player_massa > 80:
-                self.inimigo_cor = self.player_cor
-
             if self.player_massa > 38:
                 self.pontos_por_comida = 8
                 self.inimigo_cor = self.player_cor[0]
-
                 
             pygame.display.flip()
 
@@ -158,7 +146,7 @@ class Jogo:
             lugar_aleatorio_y = random.randrange(1, 650)
 
             self.lugares_aletorios.append([lugar_aleatorio_x, lugar_aleatorio_y])
-            self.comida.append(pygame.draw.circle(self.tela, self.player_cor, self.lugares_aletorios[c], self.massa_comida))
+            self.comida.append(pygame.draw.circle(self.tela, self.player_cor[0], self.lugares_aletorios[c], self.massa_comida))
 
     def criar_inimigos(self, x):
         for c in range(x):
@@ -173,7 +161,7 @@ class Jogo:
 
     def manter_massas(self, x):
         for c in range(x):
-            self.comida[c] = pygame.draw.circle(self.tela, self.player_cor, self.lugares_aletorios[c], self.massa_comida)
+            self.comida[c] = pygame.draw.circle(self.tela, self.player_cor[0], self.lugares_aletorios[c], self.massa_comida)
     
     def manter_inimigos(self, x):
         for c in range(x):
@@ -250,12 +238,6 @@ class Game_over:
             else:
                 Jogo()
 
-class Tempo:
-    def __init__(self):
-        while True:
-            return print(sleep(1))
-
-        pass 
 
 if __name__ == "__main__":
     Jogo()
