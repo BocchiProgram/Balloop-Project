@@ -15,6 +15,7 @@ class Start:
 
         largura = 1080
         altura = 650
+        dt = 0
 
         self.tela = pygame.display.set_mode((largura, altura))
         self.fundo_cor = Transicions.Trans.backgroud_color(1)
@@ -46,16 +47,7 @@ class Start:
             #player 
             self.player = pygame.draw.circle(self.tela, self.player_cor[self.player_cor_number], self.player_pos, self.player_massa)   
 
-            self.keys = pygame.key.get_pressed()
-            if self.keys[pygame.K_w]:
-                self.player_pos.y -= self.player_velocidade * dt
-            if self.keys[pygame.K_d]:
-                self.player_pos.x += self.player_velocidade * dt
-            if self.keys[pygame.K_a]:
-                self.player_pos.x -= self.player_velocidade * dt
-            if self.keys[pygame.K_s]:
-                self.player_pos.y += self.player_velocidade * dt
-
+            Functions.andar_player(dt, self.player_pos, self.player_velocidade)
 
             self.colisao_texto() 
             pygame.display.flip()
@@ -146,32 +138,13 @@ class Jogo_Hardcore:
             #player 
             self.player = pygame.draw.circle(self.tela, self.player_cor[self.player_cor_number], self.player_pos, self.player_massa)   
 
-            for c in range(len(self.lugares_aleatorios_inimigos)):
-                self.lugares_aleatorios_inimigos[c][0] += self.velocidade_x[c] 
-                self.lugares_aleatorios_inimigos[c][1] += self.velocidade_y[c]
-            
-                if self.lugares_aleatorios_inimigos[c][0] <= 0 or self.lugares_aleatorios_inimigos[c][0] >= 1080:
-                    self.velocidade_x[c] *= -1
-
-                if self.lugares_aleatorios_inimigos[c][1] <= 0 or self.lugares_aleatorios_inimigos[c][1] >= 650:
-                    self.velocidade_y[c] *= -1
-
-            self.keys = pygame.key.get_pressed()
-            if self.keys[pygame.K_w]:
-                self.player_pos.y -= self.player_velocidade * dt
-            if self.keys[pygame.K_d]:
-                self.player_pos.x += self.player_velocidade * dt
-            if self.keys[pygame.K_a]:
-                self.player_pos.x -= self.player_velocidade * dt
-            if self.keys[pygame.K_s]:
-                self.player_pos.y += self.player_velocidade * dt
+            Functions.andar_inimigos(self.lugares_aleatorios_inimigos, self.velocidade_x, self.velocidade_y)
+            Functions.andar_player(dt, self.player_pos, self.player_velocidade)
 
             self.timer_tempo += 1
             if self.timer_tempo == 57:
                 self.timer_tempo_real += 1
                 self.timer_tempo = 0
-
-            print(self.timer_tempo_real)
 
             self.colisao_comida()
             if self.timer_tempo_real > 3:
@@ -243,8 +216,7 @@ class Jogo_Hardcore:
     def colisao_comida(self):
         for c, comida in enumerate(self.comida):
             if Functions.verificar_colisao((self.player_pos.x, self.player_pos.y, self.player_massa), (comida[0], comida[1], comida[2])):
-                del self.comida[c]
-                del self.lugares_aletorios[c]
+                del self.comida[c], self.lugares_aletorios[c]
                 self.player_massa += self.pontos_por_comida
                 self.pontos += 1
                 self.criar_massas(1)
@@ -253,12 +225,9 @@ class Jogo_Hardcore:
 
     def colisao_inimigo(self):
         for c, inimigo in enumerate(self.inimigos):
-            if self.verificar_colisao((self.player_pos.x, self.player_pos.y, self.player_massa), (inimigo[0], inimigo[1], inimigo[2])):
+            if Functions.verificar_colisao((self.player_pos.x, self.player_pos.y, self.player_massa), (inimigo[0], inimigo[1], inimigo[2])):
                 if self.player_massa >38:
-                    del self.inimigos[c]
-                    del self.lugares_aleatorios_inimigos[c]
-                    del self.velocidade_x[c]
-                    del self.velocidade_y[c]
+                    del self.inimigos[c], self.lugares_aleatorios_inimigos[c], self.velocidade_x[c], self.velocidade_y[c]
                 else:
                     Game_over()
                 self.player_massa += self.pontos_por_comida
@@ -320,31 +289,14 @@ class Jogo_Pacifico:
             #player 
             self.player = pygame.draw.circle(self.tela, self.player_cor[self.player_cor_number], self.player_pos, self.player_massa)   
 
-
-            self.keys = pygame.key.get_pressed()
-            if self.keys[pygame.K_w]:
-                self.player_pos.y -= self.player_velocidade * dt
-            if self.keys[pygame.K_d]:
-                self.player_pos.x += self.player_velocidade * dt
-            if self.keys[pygame.K_a]:
-                self.player_pos.x -= self.player_velocidade * dt
-            if self.keys[pygame.K_s]:
-                self.player_pos.y += self.player_velocidade * dt
+            Functions.andar_player(dt, self.player_pos, self.player_velocidade)
 
             self.timer_tempo += 1
             if self.timer_tempo == 57:
                 self.timer_tempo_real += 1
                 self.timer_tempo = 0
 
-
             self.colisao_comida()
-            if self.timer_tempo_real > 3:
-                self.player_cor_number = 0
-            else:
-                if self.timer_tempo < 27.5:
-                    self.player_cor_number = 1
-                else:
-                    self.player_cor_number = 0 
             
             if self.player_massa > 1500:
                 self.timer_tempo_real = 0
@@ -389,8 +341,7 @@ class Jogo_Pacifico:
     def colisao_comida(self):
         for c, comida in enumerate(self.comida):
             if Functions.verificar_colisao((self.player_pos.x, self.player_pos.y, self.player_massa), (comida[0], comida[1], comida[2])):
-                del self.comida[c]
-                del self.lugares_aletorios[c]
+                del self.comida[c], self.lugares_aletorios[c]
                 self.player_massa += self.pontos_por_comida
                 self.pontos += 1
                 self.criar_massas(1)
@@ -405,8 +356,6 @@ class Game_over:
         largura = 1080
         altura = 650
 
-        #Contador de levels e pontos
-        pontos = 0 #Conta pontos
         contador = 1 #Conta levels
 
         self.tela = pygame.display.set_mode((largura, altura))
@@ -442,6 +391,29 @@ class Functions:
             return True
         else:
             return False
+    
+    def andar_player(dt, player_pos, player_velocidade):
+        keys = pygame.key.get_pressed()
+        if keys[pygame.K_w] or keys[pygame.K_UP]:
+            player_pos.y -= player_velocidade * dt
+        if keys[pygame.K_d] or keys[pygame.K_RIGHT]:
+            player_pos.x += player_velocidade * dt
+        if keys[pygame.K_a] or keys[pygame.K_LEFT]:
+            player_pos.x -= player_velocidade * dt
+        if keys[pygame.K_s] or keys[pygame.K_DOWN]:
+            player_pos.y += player_velocidade * dt
+    
+    def andar_inimigos(lugares_aleatorios_inimigos, velocidade_x, velocidade_y):
+        for c in range(len(lugares_aleatorios_inimigos)):
+            lugares_aleatorios_inimigos[c][0] += velocidade_x[c] 
+            lugares_aleatorios_inimigos[c][1] += velocidade_y[c]
+            
+            if lugares_aleatorios_inimigos[c][0] <= 0 or lugares_aleatorios_inimigos[c][0] >= 1080:
+                velocidade_x[c] *= -1
+
+            if lugares_aleatorios_inimigos[c][1] <= 0 or lugares_aleatorios_inimigos[c][1] >= 650:
+                velocidade_y[c] *= -1
+
 
 if __name__ == "__main__":
     Start()
