@@ -97,7 +97,7 @@ class Jogo_Hardcore:
         self.player_massa = 20
         self.player_cor = [Transicions.Trans.player_color(self.contador), 'orange']
         self.player_cor_number = 0
-        self.player_velocidade = 320
+        self.player_velocidade = 360
     
         while True:
             self.player_cor[0] = Transicions.Trans.player_color(self.contador) 
@@ -162,7 +162,7 @@ class Jogo_Hardcore:
             if self.player_massa > 1500:
                 self.timer_tempo_real = 0
                 self.inimigo_cor = 'red'
-                self.player_velocidade = 320
+                self.player_velocidade = 360
                 self.massa_comida = 5
                 self.player_massa = 20
                 self.contador += 1
@@ -202,9 +202,13 @@ class Jogo_Hardcore:
             self.numero_random_inimigo_x = random.randrange(0, 1080)
             self.numero_random_inimigo_y = random.randrange(0, 650)
 
-            self.velocidade_x.append(c - 0.5)
-            self.velocidade_y.append(c - 0.5)
-                
+            self.velocidade_x.append(c + 0.2)
+            self.velocidade_y.append(c + 0.2)
+
+            if self.contador > 1:
+                self.velocidade_x.append(- 1)
+                self.velocidade_y.append(- 1)
+
             self.lugares_aleatorios_inimigos.append([self.numero_random_inimigo_x, self.numero_random_inimigo_y])
             self.inimigos.append(pygame.draw.circle(self.tela, self.inimigo_cor, self.lugares_aleatorios_inimigos[c], self.inimigo_massa))
 
