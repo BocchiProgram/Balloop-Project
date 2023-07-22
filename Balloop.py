@@ -2,6 +2,7 @@ import pygame
 import random
 import Transicions
 import math
+from button import Button
 from pygame.locals import *
 from sys import exit
 
@@ -133,6 +134,7 @@ class Jogo_Hardcore:
                 if event.type == QUIT:
                     pygame.quit()
                     exit()
+                Functions.pause(self.tela)
 
             self.tela.fill(self.fundo_cor)
             self.manter_massas(20)
@@ -294,6 +296,7 @@ class Jogo_Pacifico:
                 if event.type == QUIT:
                     pygame.quit()
                     exit()
+                Functions.pause(self.tela)
 
             self.tela.fill(self.fundo_cor)
             self.manter_massas(20)
@@ -427,6 +430,44 @@ class Functions:
             if lugares_aleatorios_inimigos[c][1] <= 0 or lugares_aleatorios_inimigos[c][1] >= 650:
                 velocidade_y[c] *= -1
 
+    def pause(tela):
+        keys = pygame.key.get_pressed()
+        if keys[pygame.K_ESCAPE]:
+            c = False
+            while not c:
+                PLAY_MOUSE_POS = pygame.mouse.get_pos()
+
+                tela.fill("black")
+
+                PLAY_TEXT = pygame.font.SysFont('arial', 80, True, True).render("PAUSED.", True, "white")
+                PLAY_RECT = PLAY_TEXT.get_rect(center=(tela.get_width() / 2, tela.get_height() / 4))
+                tela.blit(PLAY_TEXT, PLAY_RECT)
+
+                PLAY_MAIN_MENU = Button(image=None, pos=(tela.get_width() / 2, 400), 
+                            text_input="MAIN MENU", font=pygame.font.SysFont('arial', 60, True, True), base_color="White", hovering_color="Green")
+                PLAY_MAIN_MENU.changeColor(PLAY_MOUSE_POS)
+                PLAY_MAIN_MENU.update(tela)
+
+                PLAY_BACK = Button(image=None, pos=(tela.get_width() / 2, 460), 
+                            text_input="BACK", font=pygame.font.SysFont('arial', 60, True, True), base_color="White", hovering_color="Green")
+                PLAY_BACK.changeColor(PLAY_MOUSE_POS)
+                PLAY_BACK.update(tela)
+
+                for event in pygame.event.get():
+                    if event.type == pygame.QUIT:
+                        pygame.quit()
+                        exit()
+                    if event.type == pygame.MOUSEBUTTONDOWN:
+                        if PLAY_BACK.checkForInput(PLAY_MOUSE_POS):
+                            c = True
+                        
+                        if PLAY_MAIN_MENU.checkForInput(PLAY_MOUSE_POS):
+                            c = True
+                            Start()
+                            
+
+                pygame.display.update()
+                    
 
 if __name__ == "__main__":
     Start()
