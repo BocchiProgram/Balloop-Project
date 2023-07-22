@@ -230,7 +230,7 @@ class Jogo_Hardcore:
                     
         self.tela.blit(self.texto_formatado, (10, 10))
 
-        self.tela.blit(self.texto_formatado_level, (930, 10))
+        self.tela.blit(self.texto_formatado_level, (910, 10))
 
     def colisao_inimigo(self):
         for c, inimigo in enumerate(self.inimigos):
@@ -286,6 +286,9 @@ class Jogo_Pacifico:
         while True: 
             self.mensagem = f'Pontos: {self.pontos}'
             self.texto_formatado = self.fonte.render(self.mensagem, True, (255, 255, 255))
+
+            self.mensagem1 = f'Level: {self.contador}'
+            self.texto_formatado_level = self.fonte.render(self.mensagem1, True, (255, 255, 255))
 
             for event in pygame.event.get():
                 if event.type == QUIT:
@@ -356,6 +359,7 @@ class Jogo_Pacifico:
                 self.criar_massas(1)
                     
         self.tela.blit(self.texto_formatado, (10, 10))
+        self.tela.blit(self.texto_formatado_level, (910, 10))
 
 class Game_over:
     def __init__(self):
