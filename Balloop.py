@@ -126,6 +126,9 @@ class Jogo_Hardcore:
             self.mensagem = f'Pontos: {self.pontos}'
             self.texto_formatado = self.fonte.render(self.mensagem, True, (255, 255, 255))
 
+            self.mensagem1 = f'Level: {self.contador}'
+            self.texto_formatado_level = self.fonte.render(self.mensagem1, True, (255, 255, 255))
+
             for event in pygame.event.get():
                 if event.type == QUIT:
                     pygame.quit()
@@ -173,13 +176,13 @@ class Jogo_Hardcore:
 
             if self.player_massa > 100 and self.player_massa < 200:
                 self.player_velocidade = 355
-                self.pontos_por_comida = 8
+                self.pontos_por_comida = 15
             if self.player_massa > 400:
                 self.player_velocidade = 355
-                self.pontos_por_comida = 3
+                self.pontos_por_comida = 2
 
             if self.player_massa > 38:
-                self.pontos_por_comida = 8
+                self.pontos_por_comida = 15
                 self.inimigo_cor = self.player_cor[0]
                 
             pygame.display.flip()
@@ -222,6 +225,8 @@ class Jogo_Hardcore:
                 self.criar_massas(1)
                     
         self.tela.blit(self.texto_formatado, (10, 10))
+
+        self.tela.blit(self.texto_formatado_level, (930, 10))
 
     def colisao_inimigo(self):
         for c, inimigo in enumerate(self.inimigos):
@@ -378,7 +383,7 @@ class Game_over:
             else:
                 Jogo_Hardcore()
 
-class Functions:
+class Functions: 
     def verificar_colisao(circulo1, circulo2):
         x1, y1, raio1 = circulo1
         x2, y2, raio2 = circulo2
