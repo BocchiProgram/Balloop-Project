@@ -29,7 +29,7 @@ class Start:
         self.player_velocidade = 320
 
         while True: 
-            self.mensagem1 = f'ZEN'
+            self.mensagem1 = f'PEACEFUL'
             self.texto_formatado1 = self.fonte.render(self.mensagem1, True, ('green'))
 
             self.mensagem2 = f'ADVENTURE'
@@ -56,23 +56,24 @@ class Start:
             dt = clock.tick(60) / 1000
 
     def colisao_texto(self):         
-        self.tela.blit(self.texto_formatado1, (190, 150))
-        self.tela.blit(self.texto_formatado2, (380, 150))
-        self.tela.blit(self.texto_formatado3, (700, 150))
+        self.tela.blit(self.texto_formatado1, (self.tela.get_width() / 2 - self.texto_formatado1.get_width() // 2, 500))
+        self.tela.blit(self.texto_formatado2, (50, 50))
+        self.tela.blit(self.texto_formatado3, (840, 50))
 
-        texto_rect1 = self.texto_formatado3.get_rect(topleft=(700, 150))
+        texto_rect1 = self.texto_formatado3.get_rect(topleft=(840, 50))
         jogador_rect1 = pygame.Rect(self.player_pos.x - self.player_massa, self.player_pos.y - self.player_massa, self.player_massa * 2, self.player_massa * 2)
+
         
         if texto_rect1.colliderect(jogador_rect1):
                 Dificuldade.hardcore()
 
-        texto_rect2 = self.texto_formatado3.get_rect(topleft=(190, 150))
+        texto_rect2 = self.texto_formatado3.get_rect(topleft=(self.tela.get_width() / 2 - self.texto_formatado1.get_width() // 2, 500))
         jogador_rect2 = pygame.Rect(self.player_pos.x - self.player_massa, self.player_pos.y - self.player_massa, self.player_massa * 2, self.player_massa * 2)
         
         if texto_rect2.colliderect(jogador_rect2):
                 Dificuldade.pacifico()
         
-        texto_rect3 = self.texto_formatado3.get_rect(topleft=(420, 150))
+        texto_rect3 = self.texto_formatado3.get_rect(topleft=(50, 50))
         jogador_rect3 = pygame.Rect(self.player_pos.x - self.player_massa, self.player_pos.y - self.player_massa, self.player_massa * 2, self.player_massa * 2)
         
         if texto_rect3.colliderect(jogador_rect3):
@@ -411,7 +412,7 @@ class Functions:
                             
 
                 pygame.display.update()
-                    
+
 
 if __name__ == "__main__":
     Start()
