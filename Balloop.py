@@ -64,23 +64,23 @@ class Start:
         jogador_rect1 = pygame.Rect(self.player_pos.x - self.player_massa, self.player_pos.y - self.player_massa, self.player_massa * 2, self.player_massa * 2)
         
         if texto_rect1.colliderect(jogador_rect1):
-                Jogo_Hardcore()
+                Dificuldade.hardcore()
 
         texto_rect2 = self.texto_formatado3.get_rect(topleft=(190, 150))
         jogador_rect2 = pygame.Rect(self.player_pos.x - self.player_massa, self.player_pos.y - self.player_massa, self.player_massa * 2, self.player_massa * 2)
         
         if texto_rect2.colliderect(jogador_rect2):
-                Jogo_Pacifico()
+                Dificuldade.pacifico()
         
         texto_rect3 = self.texto_formatado3.get_rect(topleft=(420, 150))
         jogador_rect3 = pygame.Rect(self.player_pos.x - self.player_massa, self.player_pos.y - self.player_massa, self.player_massa * 2, self.player_massa * 2)
         
         if texto_rect3.colliderect(jogador_rect3):
-                Jogo_Pacifico()
-                    
-class Jogo_Hardcore:
+                Dificuldade.adventure()
+
+class Jogo:
     def __init__(self):
-        clock = pygame.time.Clock()
+        self.clock = pygame.time.Clock()
 
         self.timer_tempo = 0
         self.timer_tempo_real = 0
@@ -88,46 +88,52 @@ class Jogo_Hardcore:
         pygame.init()
         pygame.display.set_caption('Regular Game')
 
-        dt = 0
-        largura = 1080
-        altura = 650
-
-        #Contador de levels e pontos
-        self.pontos = 0 #Conta pontos
-        self.contador = 1 #Conta levels
-
-        self.tela = pygame.display.set_mode((largura, altura))
-        self.fundo_cor = Transicions.Trans.backgroud_color(self.contador)
-        self.fonte = pygame.font.SysFont('arial', 40, True, True)        
+        self.dt = 0
+        self.largura = 1080
+        self.altura = 650
+        self.tela = pygame.display.set_mode((self.largura, self.altura))
+        self.fonte = pygame.font.SysFont('arial', 40, True, True)  
 
         self.player_pos = pygame.Vector2(self.tela.get_width() / 2, self.tela.get_height() / 2)
-        self.player_massa = 20
+        
+        self.inimigos = []
+        self.lugares_aleatorios_inimigos = []
+        self.inimigo_cor = 'red'
+        self.inimigo_massa = 8
+        self.inimigo_x = self.largura
+        self.inimigo_y = self.altura
+
+        self.velocidade_x = []
+        self.velocidade_y = []
+        
+        self.comida = []
+        self.lugares_aletorios = []
+
+    def run(self, atributos):
+        self.atributos = atributos
+        #Contador de levels e pontos
+        self.pontos = atributos['pontos'][0] #Conta pontos
+        self.contador = atributos['contador'][0] #Conta levels
+
+        self.fundo_cor = Transicions.Trans.backgroud_color(self.contador)
+        
+        self.player_massa = atributos['player_massa'][0]
         self.player_cor = [Transicions.Trans.player_color(self.contador), 'orange']
-        self.player_cor_number = 0
-        self.player_velocidade = 360
+        self.player_cor_number = atributos['player_cor_number'][0]
+        self.player_velocidade = atributos['player_velocidade'][0]
     
         while True:
             self.player_cor[0] = Transicions.Trans.player_color(self.contador) 
             if self.player_cor[0] != self.fundo_cor:
                 break
 
-        self.inimigo_cor = 'red'
-        self.inimigo_massa = 8
-        self.inimigo_x = largura
-        self.inimigo_y = altura
-        self.velocidade_x = []
-        self.velocidade_y = []
         
-        self.comida = []
-        self.pontos_por_comida = 2
-        self.massa_comida = 5
-        self.lugares_aletorios = []
-        
-        self.inimigos = []
-        self.lugares_aleatorios_inimigos = []
+        self.pontos_por_comida = atributos['pontos_por_comida'][0]
+        self.massa_comida = atributos['massa_comida'][0]
 
-        self.criar_massas(20)
-        self.criar_inimigos(self.contador)
+        self.criar_massas(atributos['criar_massas'][0])
+        if atributos['inimigos']:
+            self.criar_inimigos(self.contador)
 
         while True: 
             self.mensagem = f'Pontos: {self.pontos}'
@@ -140,17 +146,19 @@ class Jogo_Hardcore:
                 if event.type == QUIT:
                     pygame.quit()
                     exit()
-                Functions.pause(self.tela)
 
             self.tela.fill(self.fundo_cor)
-            self.manter_massas(20)
-            self.manter_inimigos(len(self.inimigos))
+            self.manter_massas(atributos['criar_massas'][0])
+            if atributos['inimigos']:
+                self.manter_inimigos(len(self.inimigos))
             
             #player 
-            self.player = pygame.draw.circle(self.tela, self.player_cor[self.player_cor_number], self.player_pos, self.player_massa)   
-
-            Functions.andar_inimigos(self.lugares_aleatorios_inimigos, self.velocidade_x, self.velocidade_y)
-            Functions.andar_player(dt, self.player_pos, self.player_velocidade)
+            self.player = pygame.draw.circle(self.tela, self.player_cor[self.player_cor_number], self.player_pos, self.player_massa) 
+              
+            if atributos['inimigos']:
+                Functions.andar_inimigos(self.lugares_aleatorios_inimigos, self.velocidade_x, self.velocidade_y)
+            Functions.andar_player(self.dt, self.player_pos, self.player_velocidade)
+            Functions.pause(self.tela)
 
             self.timer_tempo += 1
             if self.timer_tempo == 57:
@@ -158,24 +166,26 @@ class Jogo_Hardcore:
                 self.timer_tempo = 0
 
             self.colisao_comida()
-            if self.timer_tempo_real > 3:
-                self.colisao_inimigo()
-                self.player_cor_number = 0
-            else:
-                if self.timer_tempo < 27.5:
-                    self.player_cor_number = 1
+            if atributos['inimigos']:
+                if self.timer_tempo_real > 3:
+                    self.colisao_inimigo()
+                    self.player_cor_number = atributos['player_cor_number'][1]
                 else:
-                    self.player_cor_number = 0 
+                    if self.timer_tempo < 27.5:
+                        self.player_cor_number = atributos['player_cor_number'][2]
+                    else:
+                        self.player_cor_number = atributos['player_cor_number'][3] 
             
             if self.player_massa > 1500:
                 self.timer_tempo_real = 0
                 self.inimigo_cor = 'red'
-                self.player_velocidade = 360
-                self.massa_comida = 5
-                self.player_massa = 20
+                self.player_velocidade = atributos['player_velocidade'][1]
+                self.massa_comida = atributos['massa_comida'][1]
+                self.player_massa = atributos['player_massa'][1]
                 self.contador += 1
-                self.pontos_por_comida = 2
-                self.criar_inimigos(self.contador)
+                self.pontos_por_comida = atributos['pontos_por_comida'][1]
+                if atributos['inimigos']:
+                    self.criar_inimigos(self.contador)
                 self.fundo_cor = Transicions.Trans.backgroud_color(self.contador)
                 while True:
                     self.player_cor[0] = Transicions.Trans.player_color(self.contador) 
@@ -183,19 +193,19 @@ class Jogo_Hardcore:
                         break
 
             if self.player_massa > 100 and self.player_massa < 200:
-                self.player_velocidade = 355
-                self.pontos_por_comida = 10
+                self.player_velocidade = atributos['player_velocidade'][2]
+                self.pontos_por_comida = atributos['pontos_por_comida'][2]
             if self.player_massa > 400:
-                self.player_velocidade = 355
-                self.pontos_por_comida = 5
+                self.player_velocidade = atributos['player_velocidade'][3]
+                self.pontos_por_comida = atributos['pontos_por_comida'][3]
 
             if self.player_massa > 38:
-                self.pontos_por_comida = 15
+                self.pontos_por_comida = atributos['pontos_por_comida'][4]
                 self.inimigo_cor = self.player_cor[0]
                 
             pygame.display.flip()
 
-            dt = clock.tick(60) / 1000
+            self.dt = self.clock.tick(60) / 1000
 
     def criar_massas(self, x):
         for c in range(x):
@@ -246,132 +256,13 @@ class Jogo_Hardcore:
                 if self.player_massa >38:
                     del self.inimigos[c], self.lugares_aleatorios_inimigos[c], self.velocidade_x[c], self.velocidade_y[c]
                 else:
-                    Game_over()
+                    self.gameover()
                 self.player_massa += self.pontos_por_comida
                 self.pontos += 10
                     
         self.tela.blit(self.texto_formatado, (10, 10))
 
-class Jogo_Pacifico:
-    def __init__(self):
-        clock = pygame.time.Clock()
-
-        self.timer_tempo = 0
-        self.timer_tempo_real = 0
-        pygame.init()
-        pygame.display.set_caption('Regular Game')
-
-        largura = 1080
-        altura = 650
-        dt = 0
-
-        #Contador de levels e pontos
-        self.pontos = 0 #Conta pontos
-        self.contador = 1 #Conta levels
-
-        self.tela = pygame.display.set_mode((largura, altura))
-        self.fundo_cor = Transicions.Trans.backgroud_color(self.contador)
-        self.fonte = pygame.font.SysFont('arial', 40, True, True)        
-
-        self.player_pos = pygame.Vector2(self.tela.get_width() / 2, self.tela.get_height() / 2)
-        self.player_massa = 20
-        self.player_cor = [Transicions.Trans.player_color(self.contador), 'orange']
-        self.player_cor_number = 0
-        self.player_velocidade = 320
-    
-        while True:
-            self.player_cor[0] = Transicions.Trans.player_color(self.contador) 
-            if self.player_cor[0] != self.fundo_cor:
-                break
-        
-        self.comida = []
-        self.pontos_por_comida = 5
-        self.massa_comida = 5
-        self.lugares_aletorios = []
-
-        self.criar_massas(20)
-
-        while True: 
-            self.mensagem = f'Pontos: {self.pontos}'
-            self.texto_formatado = self.fonte.render(self.mensagem, True, (255, 255, 255))
-
-            self.mensagem1 = f'Level: {self.contador}'
-            self.texto_formatado_level = self.fonte.render(self.mensagem1, True, (255, 255, 255))
-
-            for event in pygame.event.get():
-                if event.type == QUIT:
-                    pygame.quit()
-                    exit()
-                Functions.pause(self.tela)
-
-            self.tela.fill(self.fundo_cor)
-            self.manter_massas(20)
-            
-            #player 
-            self.player = pygame.draw.circle(self.tela, self.player_cor[self.player_cor_number], self.player_pos, self.player_massa)   
-
-            Functions.andar_player(dt, self.player_pos, self.player_velocidade)
-
-            self.timer_tempo += 1
-            if self.timer_tempo == 57:
-                self.timer_tempo_real += 1
-                self.timer_tempo = 0
-
-            self.colisao_comida()
-            
-            if self.player_massa > 1500:
-                self.timer_tempo_real = 0
-                self.player_velocidade = 320
-                self.massa_comida = 5
-                self.player_massa = 20
-                self.contador += 1
-                self.pontos_por_comida = 5
-                self.fundo_cor = Transicions.Trans.backgroud_color(self.contador)
-                while True:
-                    self.player_cor[0] = Transicions.Trans.player_color(self.contador) 
-                    if self.player_cor[0] != self.fundo_cor:
-                        break
-
-            if self.player_massa > 100 and self.player_massa < 200:
-                self.player_velocidade = 355
-                self.pontos_por_comida = 10
-            if self.player_massa > 400:
-                self.player_velocidade = 355
-                self.pontos_por_comida = 3
-
-            if self.player_massa > 38:
-                self.pontos_por_comida = 5
-                self.inimigo_cor = self.player_cor[0]
-                
-            pygame.display.flip()
-
-            dt = clock.tick(60) / 1000
-
-    def criar_massas(self, x):
-        for c in range(x):
-            lugar_aleatorio_x = random.randrange(1, 1080)
-            lugar_aleatorio_y = random.randrange(1, 650)
-
-            self.lugares_aletorios.append([lugar_aleatorio_x, lugar_aleatorio_y])
-            self.comida.append(pygame.draw.circle(self.tela, self.player_cor[0], self.lugares_aletorios[c], self.massa_comida))
-
-    def manter_massas(self, x):
-        for c in range(x):
-            self.comida[c] = pygame.draw.circle(self.tela, self.player_cor[0], self.lugares_aletorios[c], self.massa_comida)
-
-    def colisao_comida(self):
-        for c, comida in enumerate(self.comida):
-            if Functions.verificar_colisao((self.player_pos.x, self.player_pos.y, self.player_massa), (comida[0], comida[1], comida[2])):
-                del self.comida[c], self.lugares_aletorios[c]
-                self.player_massa += self.pontos_por_comida
-                self.pontos += 1
-                self.criar_massas(1)
-                    
-        self.tela.blit(self.texto_formatado, (10, 10))
-        self.tela.blit(self.texto_formatado_level, (910, 10))
-
-class Game_over:
-    def __init__(self):
+    def gameover(self):
         pygame.init()
         pygame.display.set_caption('Regular Game')
 
@@ -398,7 +289,48 @@ class Game_over:
                 pygame.display.flip()
                 pygame.display.flip()
             else:
-                Jogo_Hardcore()
+                if self.atributos['hardcore']:
+                    Dificuldade.hardcore()
+
+class Dificuldade:
+    def hardcore():
+        atributos = {
+            'hardcore': True,
+            'inimigos': True,
+            'contador': [1],
+            'player_massa': [20, 20],
+            'pontos': [0],
+            'contador': [1],
+            'player_cor_number': [0, 0, 1, 0],
+            'player_velocidade': [360, 360, 355, 355],
+            'pontos_por_comida': [2, 2, 10, 5, 15],
+            'massa_comida': [5, 5],
+            'timer_tempo_real': [0],
+            'inimigo_cor': ['red'],
+            'criar_massas': [20]
+        }   
+        jogo = Jogo()
+        jogo.run(atributos)
+    def pacifico():
+        atributos = {
+            'pacifico': True,
+            'inimigos': False,
+            'pontos': [0],
+            'contador': [1],
+            'player_massa': [20, 20],
+            'player_cor_number': [0, 0, 0, 0],
+            'player_velocidade': [320, 320, 355, 355],
+            'pontos_por_comida': [5, 5, 15, 1, 5],
+            'massa_comida': [5, 5],
+            'timer_tempo_real': [0],
+            'criar_massas': [20]
+        }
+        jogo = Jogo()
+        jogo.run(atributos)
+    
+    def adventure():
+        pass
+    
 
 class Functions: 
     def verificar_colisao(circulo1, circulo2):
