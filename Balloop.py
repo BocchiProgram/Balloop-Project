@@ -29,14 +29,14 @@ class Start:
         self.player_velocidade = 320
 
         while True: 
-            self.mensagem1 = f'PACIFICO'
-            self.texto_formatado1 = self.fonte.render(self.mensagem1, True, (255, 255, 255))
+            self.mensagem1 = f'ZEN'
+            self.texto_formatado1 = self.fonte.render(self.mensagem1, True, ('green'))
 
             self.mensagem2 = f'ADVENTURE'
-            self.texto_formatado2 = self.fonte.render(self.mensagem2, True, (255, 255, 255))
+            self.texto_formatado2 = self.fonte.render(self.mensagem2, True, ('yellow'))
 
             self.mensagem3 = f'HARDCORE'
-            self.texto_formatado3 = self.fonte.render(self.mensagem3, True, (255, 255, 255))
+            self.texto_formatado3 = self.fonte.render(self.mensagem3, True, ('red'))
 
             for event in pygame.event.get():
                 if event.type == QUIT:
@@ -57,7 +57,7 @@ class Start:
 
     def colisao_texto(self):         
         self.tela.blit(self.texto_formatado1, (190, 150))
-        self.tela.blit(self.texto_formatado2, (420, 150))
+        self.tela.blit(self.texto_formatado2, (380, 150))
         self.tela.blit(self.texto_formatado3, (700, 150))
 
         texto_rect1 = self.texto_formatado3.get_rect(topleft=(700, 150))
@@ -283,9 +283,15 @@ class Jogo:
             keys = pygame.key.get_pressed()
             if not keys[pygame.K_SPACE]:
                 self.tela.fill((0, 0, 0))  # Preenche a tela com a cor preta
+
                 fonte_game_over = pygame.font.SysFont('arial', 80, True, True)
-                mensagem_game_over = fonte_game_over.render('Game Over', True, (255, 255, 255))
+                mensagem_game_over = fonte_game_over.render('Game Over', True, ('red'))
                 self.tela.blit(mensagem_game_over, (self.tela.get_width() // 2 - mensagem_game_over.get_width() // 2, self.tela.get_height() // 2 - mensagem_game_over.get_height() // 2))
+
+                fonte_try_again = pygame.font.SysFont('arial', 30, True, True)
+                mensagem_try_again = fonte_try_again.render("Press 'space' to try again!", True, (255, 255, 255))
+                self.tela.blit(mensagem_try_again, (self.tela.get_width() // 2 - mensagem_try_again.get_width() // 2, 390 - mensagem_try_again.get_height() // 2))
+
                 pygame.display.flip()
                 pygame.display.flip()
             else:
@@ -311,6 +317,7 @@ class Dificuldade:
         }   
         jogo = Jogo()
         jogo.run(atributos)
+        
     def pacifico():
         atributos = {
             'pacifico': True,
@@ -331,7 +338,6 @@ class Dificuldade:
     def adventure():
         pass
     
-
 class Functions: 
     def verificar_colisao(circulo1, circulo2):
         x1, y1, raio1 = circulo1
