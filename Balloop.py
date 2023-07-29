@@ -2,10 +2,21 @@ import pygame
 import random
 import Transicions
 import math
+import yaml
 from button import Button
 from pygame.locals import *
 from sys import exit
 
+
+with open('config.yaml') as f:
+    config = yaml.safe_load(f)
+
+if config['level'] == '':
+    config['level'] = 1
+                
+    with open('config.yaml', 'w') as f:
+        yaml.dump(config, f)
+            
 
 class Start:
     def __init__(self):
@@ -77,7 +88,7 @@ class Start:
         jogador_rect3 = pygame.Rect(self.player_pos.x - self.player_massa, self.player_pos.y - self.player_massa, self.player_massa * 2, self.player_massa * 2)
         
         if texto_rect3.colliderect(jogador_rect3):
-                Dificuldade.adventure()
+                Dificuldade.adventure(self.tela)
 
 class Jogo:
     def __init__(self):
@@ -184,6 +195,11 @@ class Jogo:
                 self.massa_comida = atributos['massa_comida'][1]
                 self.player_massa = atributos['player_massa'][1]
                 self.contador += 1
+                if atributos['modo'] == 'adventure':
+                    config['level'] = int(self.contador) / 5
+                        
+                    with open('config.yaml', 'w') as f:
+                        yaml.dump(config, f)
                 self.pontos_por_comida = atributos['pontos_por_comida'][1]
                 if atributos['inimigos']:
                     self.criar_inimigos(self.contador)
@@ -269,8 +285,7 @@ class Jogo:
 
         largura = 1080
         altura = 650
-
-        contador = 1 #Conta levels
+        contador = 1
 
         self.tela = pygame.display.set_mode((largura, altura))
         self.fundo_cor = Transicions.Trans.backgroud_color(contador)
@@ -296,18 +311,20 @@ class Jogo:
                 pygame.display.flip()
                 pygame.display.flip()
             else:
-                if self.atributos['hardcore']:
-                    Dificuldade.hardcore()
+                if self.atributos['modo'] == 'hardcore':
+                        Dificuldade.hardcore()
+                
+                if self.atributos['modo'] == 'adventure':
+                        Dificuldade.adventure()
 
 class Dificuldade:
     def hardcore():
         atributos = {
-            'hardcore': True,
+            'modo': 'hardcore',
             'inimigos': True,
             'contador': [1],
             'player_massa': [20, 20],
             'pontos': [0],
-            'contador': [1],
             'player_cor_number': [0, 0, 1, 0],
             'player_velocidade': [360, 360, 355, 355],
             'pontos_por_comida': [2, 2, 10, 5, 15],
@@ -321,7 +338,7 @@ class Dificuldade:
         
     def pacifico():
         atributos = {
-            'pacifico': True,
+            'modo': 'pacifico',
             'inimigos': False,
             'pontos': [0],
             'contador': [1],
@@ -336,8 +353,26 @@ class Dificuldade:
         jogo = Jogo()
         jogo.run(atributos)
     
-    def adventure():
-        pass
+    def adventure(tela):
+        atributos = {
+            'modo': 'adventure',
+            'inimigos': True,
+            'contador': [config['level']],
+            'player_massa': [20, 20],
+            'pontos': [0],
+            'player_cor_number': [0, 0, 1, 0],
+            'player_velocidade': [360, 360, 355, 355],
+            'pontos_por_comida': [2, 2, 10, 5, 15],
+            'massa_comida': [5, 5],
+            'timer_tempo_real': [0],
+            'inimigo_cor': ['red'],
+            'criar_massas': [20]
+        }
+
+        Functions.level_select(tela)
+
+        # jogo = Jogo()
+        # jogo.run(atributos)
     
 class Functions: 
     def verificar_colisao(circulo1, circulo2):
@@ -413,6 +448,48 @@ class Functions:
 
                 pygame.display.update()
 
+    def level_select(tela):
+        LEVEIS = []
+        for c in range(config['level']):
+            c += 1
+            LEVEIS.append(c)
 
+        while True:
+            PLAY_MOUSE_POS = pygame.mouse.get_pos()
+
+            tela.fill("black")
+
+            CHOOSE_TEXT = pygame.font.SysFont('arial', 60, True, True).render("CHOOSE LEVEL.", True, "white")
+            CHOOSE_RECT = CHOOSE_TEXT.get_rect(center=(tela.get_width() / 2, tela.get_height() / 10))
+            tela.blit(CHOOSE_TEXT, CHOOSE_RECT)
+
+            PLAY_MAIN_MENU = Button(image=None, pos=(tela.get_width() / 2, 580), 
+                        text_input="MAIN MENU", font=pygame.font.SysFont('arial', 40, True, True), base_color="White", hovering_color="Green")
+            PLAY_MAIN_MENU.changeColor(PLAY_MOUSE_POS)
+            PLAY_MAIN_MENU.update(tela)
+
+            PLAY_BACK = Button(image=None, pos=(tela.get_width() / 2, 630), 
+                        text_input="BACK", font=pygame.font.SysFont('arial', 40, True, True), base_color="White", hovering_color="Green")
+            PLAY_BACK.changeColor(PLAY_MOUSE_POS)
+            PLAY_BACK.update(tela)
+
+
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    exit()
+
+            for level in range(0, 30, 10):
+                
+                for c in range(10):
+                    c +=1
+                    botao_level = Button(image=None, pos=(c * 100, 250 + (level * 8)), 
+                            text_input=f"{level + c}", font=pygame.font.SysFont('arial', 50, True, True), base_color="White", hovering_color="Green")
+                    botao_level.changeColor(PLAY_MOUSE_POS)
+                    botao_level.update(tela)
+
+            pygame.display.update()
+
+            
 if __name__ == "__main__":
     Start()
