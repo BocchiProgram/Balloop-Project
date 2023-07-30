@@ -7,16 +7,17 @@ from button import Button
 from pygame.locals import *
 from sys import exit
 
-
 with open('config.yaml') as f:
     config = yaml.safe_load(f)
 
 if config['level'] == '':
     config['level'] = 1
+
+config['fase'] = 1
                 
-    with open('config.yaml', 'w') as f:
-        yaml.dump(config, f)
-            
+with open('config.yaml', 'w') as f:
+    yaml.dump(config, f)
+
 
 class Start:
     def __init__(self):
@@ -88,7 +89,7 @@ class Start:
         jogador_rect3 = pygame.Rect(self.player_pos.x - self.player_massa, self.player_pos.y - self.player_massa, self.player_massa * 2, self.player_massa * 2)
         
         if texto_rect3.colliderect(jogador_rect3):
-                Dificuldade.adventure(self.tela)
+                Functions.level_select(self.tela)
 
 class Jogo:
     def __init__(self):
@@ -125,19 +126,31 @@ class Jogo:
         self.atributos = atributos
         #Contador de levels e pontos
         self.pontos = atributos['pontos'][0] #Conta pontos
-        self.contador = atributos['contador'][0] #Conta levels
+        if atributos['modo'] != 'adventure':
+            self.contador = atributos['contador'][0] #Conta levels
+            self.fundo_cor = Transicions.Trans.backgroud_color(self.contador)
+            self.player_cor = [Transicions.Trans.player_color(self.contador), 'orange']
+        else:
+            self.contador = config['fase']
+            self.fundo_cor = Transicions.Trans.backgroud_color(config['level'])
+            self.player_cor = [Transicions.Trans.player_color(config['level']), 'orange']
 
-        self.fundo_cor = Transicions.Trans.backgroud_color(self.contador)
+        
         
         self.player_massa = atributos['player_massa'][0]
-        self.player_cor = [Transicions.Trans.player_color(self.contador), 'orange']
         self.player_cor_number = atributos['player_cor_number'][0]
         self.player_velocidade = atributos['player_velocidade'][0]
-    
-        while True:
-            self.player_cor[0] = Transicions.Trans.player_color(self.contador) 
-            if self.player_cor[0] != self.fundo_cor:
-                break
+
+        if atributos['modo'] != 'adventure':
+            while True:
+                self.player_cor[0] = Transicions.Trans.player_color(self.contador) 
+                if self.player_cor[0] != self.fundo_cor:
+                    break
+        else:
+            while True:
+                self.player_cor[0] = Transicions.Trans.player_color(config['level']) 
+                if self.player_cor[0] != self.fundo_cor:
+                    break
 
         
         self.pontos_por_comida = atributos['pontos_por_comida'][0]
@@ -147,12 +160,22 @@ class Jogo:
         if atributos['inimigos']:
             self.criar_inimigos(self.contador)
 
-        while True: 
-            self.mensagem = f'Pontos: {self.pontos}'
-            self.texto_formatado = self.fonte.render(self.mensagem, True, (255, 255, 255))
-
-            self.mensagem1 = f'Level: {self.contador}'
-            self.texto_formatado_level = self.fonte.render(self.mensagem1, True, (255, 255, 255))
+        while True:
+            if atributos['modo'] != 'adventure':
+                self.mensagem = f'Points: {self.pontos}'
+                self.texto_formatado = self.fonte.render(self.mensagem, True, (255, 255, 255))
+                
+                self.mensagem1 = f'Phase: {self.contador}'
+                self.texto_formatado_level = self.fonte.render(self.mensagem1, True, (255, 255, 255))
+            else:
+                phase = config['fase']
+                level = config['level']
+                
+                self.mensagem = f'Level: {level}'
+                self.texto_formatado = self.fonte.render(self.mensagem, True, (255, 255, 255))
+                
+                self.mensagem1 = f'Phase: {phase}'
+                self.texto_formatado_level = self.fonte.render(self.mensagem1, True, (255, 255, 255))
 
             for event in pygame.event.get():
                 if event.type == QUIT:
@@ -169,6 +192,7 @@ class Jogo:
               
             if atributos['inimigos']:
                 Functions.andar_inimigos(self.lugares_aleatorios_inimigos, self.velocidade_x, self.velocidade_y)
+            
             Functions.andar_player(self.dt, self.player_pos, self.player_velocidade)
             Functions.pause(self.tela)
 
@@ -193,21 +217,46 @@ class Jogo:
                 self.inimigo_cor = 'red'
                 self.player_velocidade = atributos['player_velocidade'][1]
                 self.massa_comida = atributos['massa_comida'][1]
+                self.pontos_por_comida = atributos['pontos_por_comida'][1]
                 self.player_massa = atributos['player_massa'][1]
                 self.contador += 1
+                
                 if atributos['modo'] == 'adventure':
-                    config['level'] = int(self.contador) / 5
+                    config['fase'] += 1
+
+                    if config['fase'] > 5:
+                        config['fase'] = 1
+                        config['level'] += 1
+                    
+                        if config['level'] > config['maxlevel']:
+                            config['maxlevel'] = config['level']
                         
                     with open('config.yaml', 'w') as f:
                         yaml.dump(config, f)
-                self.pontos_por_comida = atributos['pontos_por_comida'][1]
+
+                    Dificuldade.adventure(self.tela)
+                    
+                
+
                 if atributos['inimigos']:
                     self.criar_inimigos(self.contador)
-                self.fundo_cor = Transicions.Trans.backgroud_color(self.contador)
-                while True:
-                    self.player_cor[0] = Transicions.Trans.player_color(self.contador) 
-                    if self.player_cor[0] != self.fundo_cor:
-                        break
+
+                if atributos['modo']  != 'adventure':
+                    self.fundo_cor = Transicions.Trans.backgroud_color(self.contador)
+                else:
+                    self.fundo_cor = Transicions.Trans.backgroud_color(config['level'])
+
+                #Garente que a cor de fundo não seja igual a cor do player
+                if atributos['modo'] != 'adventure':
+                    while True:
+                        self.player_cor[0] = Transicions.Trans.player_color(self.contador) 
+                        if self.player_cor[0] != self.fundo_cor:
+                            break
+                else:
+                    while True:
+                        self.player_cor[0] = Transicions.Trans.player_color(config['level']) 
+                        if self.player_cor[0] != self.fundo_cor:
+                            break
 
             if self.player_massa > 100 and self.player_massa < 200:
                 self.player_velocidade = atributos['player_velocidade'][2]
@@ -215,7 +264,6 @@ class Jogo:
             if self.player_massa > 400:
                 self.player_velocidade = atributos['player_velocidade'][3]
                 self.pontos_por_comida = atributos['pontos_por_comida'][3]
-
             if self.player_massa > 38:
                 self.pontos_por_comida = atributos['pontos_por_comida'][4]
                 self.inimigo_cor = self.player_cor[0]
@@ -285,10 +333,9 @@ class Jogo:
 
         largura = 1080
         altura = 650
-        contador = 1
 
         self.tela = pygame.display.set_mode((largura, altura))
-        self.fundo_cor = Transicions.Trans.backgroud_color(contador)
+        self.fundo_cor = 'black'
         self.fonte = pygame.font.SysFont('arial', 40, True, True)   
         while True:
             for event in pygame.event.get():
@@ -315,7 +362,10 @@ class Jogo:
                         Dificuldade.hardcore()
                 
                 if self.atributos['modo'] == 'adventure':
-                        Dificuldade.adventure()
+                        config['fase'] = 1
+                        with open('config.yaml', 'w') as f:
+                            yaml.dump(config, f)
+                        Dificuldade.adventure(self.tela)
 
 class Dificuldade:
     def hardcore():
@@ -357,7 +407,7 @@ class Dificuldade:
         atributos = {
             'modo': 'adventure',
             'inimigos': True,
-            'contador': [config['level']],
+            'contador': [1],
             'player_massa': [20, 20],
             'pontos': [0],
             'player_cor_number': [0, 0, 1, 0],
@@ -368,11 +418,10 @@ class Dificuldade:
             'inimigo_cor': ['red'],
             'criar_massas': [20]
         }
+        
 
-        Functions.level_select(tela)
-
-        # jogo = Jogo()
-        # jogo.run(atributos)
+        jogo = Jogo()
+        jogo.run(atributos)
     
 class Functions: 
     def verificar_colisao(circulo1, circulo2):
@@ -433,6 +482,10 @@ class Functions:
                 PLAY_BACK.changeColor(PLAY_MOUSE_POS)
                 PLAY_BACK.update(tela)
 
+                config['fase'] = 1
+                with open('config.yaml', 'w') as f:
+                    yaml.dump(config, f)
+
                 for event in pygame.event.get():
                     if event.type == pygame.QUIT:
                         pygame.quit()
@@ -449,12 +502,12 @@ class Functions:
                 pygame.display.update()
 
     def level_select(tela):
-        LEVEIS = []
-        for c in range(config['level']):
-            c += 1
-            LEVEIS.append(c)
+        LEVEIS = [ v + 1 for v in range(config['maxlevel'])]
+        
+        botao_level = []
+        terminate = False
 
-        while True:
+        while not terminate:
             PLAY_MOUSE_POS = pygame.mouse.get_pos()
 
             tela.fill("black")
@@ -473,20 +526,31 @@ class Functions:
             PLAY_BACK.changeColor(PLAY_MOUSE_POS)
             PLAY_BACK.update(tela)
 
-
+            for level in range(0, 30, 10):
+                for c in range(10):
+                    c +=1
+                    botao_level.append(Button(image=None, pos=(c * 100, 250 + (level * 8)), text_input=f"{level + c}", font=pygame.font.SysFont('arial', 50, True, True), base_color="white", hovering_color="Green"))
+            
+            for c in range(30):
+                botao_level[c].changeColor(PLAY_MOUSE_POS)
+                botao_level[c].update(tela)
+            
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     pygame.quit()
                     exit()
-
-            for level in range(0, 30, 10):
                 
-                for c in range(10):
-                    c +=1
-                    botao_level = Button(image=None, pos=(c * 100, 250 + (level * 8)), 
-                            text_input=f"{level + c}", font=pygame.font.SysFont('arial', 50, True, True), base_color="White", hovering_color="Green")
-                    botao_level.changeColor(PLAY_MOUSE_POS)
-                    botao_level.update(tela)
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    for c in range(30):
+                        if botao_level[c].checkForInput(PLAY_MOUSE_POS):
+                            if len(LEVEIS) < c+1:
+                                pass
+                            else:
+                                config['level'] = c + 1 
+                                with open('config.yaml', 'w') as f:
+                                    yaml.dump(config, f)
+                                Dificuldade.adventure(tela)
+                                
 
             pygame.display.update()
 
