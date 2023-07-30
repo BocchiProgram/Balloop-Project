@@ -1,5 +1,5 @@
 import Transicions
-from pygame import time, init, display, font, Vector2, quit, draw, QUIT, mouse, MOUSEBUTTONDOWN, key, K_SPACE, K_ESCAPE, K_w, K_a, K_s, K_d, K_UP, K_RIGHT, K_DOWN, K_LEFT, Rect
+from pygame import time, init, display, font, Vector2, quit, draw, QUIT, mouse, MOUSEBUTTONDOWN, key, K_SPACE, K_ESCAPE, K_w, K_a, K_s, K_d, K_UP, K_RIGHT, K_DOWN, K_LEFT, Rect, image
 from pygame import event as evento
 from random import randrange
 from math import sqrt
@@ -19,6 +19,7 @@ config['fase'] = 1
 with open('config.yaml', 'w') as f:
     dump(config, f)
 
+icone = image.load('regulargame.png')
 
 class Start:
     def __init__(self):
@@ -26,6 +27,7 @@ class Start:
 
         init()
         display.set_caption('Regular Game')
+        display.set_icon(icone)
 
         largura = 1080
         altura = 650
