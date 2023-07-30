@@ -3,6 +3,7 @@ import random
 import Transicions
 import math
 import yaml
+import asyncio
 from button import Button
 from pygame.locals import *
 from sys import exit
@@ -20,7 +21,7 @@ with open('config.yaml', 'w') as f:
 
 
 class Start:
-    def __init__(self):
+    async def start(self):
         clock = pygame.time.Clock()
 
         pygame.init()
@@ -66,6 +67,7 @@ class Start:
             pygame.display.flip()
 
             dt = clock.tick(60) / 1000
+            await asyncio.sleep(0)
 
     def colisao_texto(self):         
         self.tela.blit(self.texto_formatado1, (self.tela.get_width() / 2 - self.texto_formatado1.get_width() // 2, 500))
@@ -127,15 +129,18 @@ class Jogo:
         #Contador de levels e pontos
         self.pontos = atributos['pontos'][0] #Conta pontos
         if atributos['modo'] != 'adventure':
+            self.quant_inimigos = atributos['contador'][0]
+            self.inimigos_por_phase = 1
             self.contador = atributos['contador'][0] #Conta levels
             self.fundo_cor = Transicions.Trans.backgroud_color(self.contador)
             self.player_cor = [Transicions.Trans.player_color(self.contador), 'orange']
         else:
+            self.quant_inimigos = atributos['quant_inimigos'][config['fase'] - 1]
+            self.inimigos_por_phase = 0
             self.contador = config['fase']
             self.fundo_cor = Transicions.Trans.backgroud_color(config['level'])
             self.player_cor = [Transicions.Trans.player_color(config['level']), 'orange']
 
-        
         
         self.player_massa = atributos['player_massa'][0]
         self.player_cor_number = atributos['player_cor_number'][0]
@@ -158,7 +163,10 @@ class Jogo:
 
         self.criar_massas(atributos['criar_massas'][0])
         if atributos['inimigos']:
-            self.criar_inimigos(self.contador)
+            if atributos['modo'] == 'adventure':
+                self.criar_inimigos(self.quant_inimigos)
+            else:
+                self.criar_inimigos(self.contador)
 
         while True:
             if atributos['modo'] != 'adventure':
@@ -220,6 +228,7 @@ class Jogo:
                 self.pontos_por_comida = atributos['pontos_por_comida'][1]
                 self.player_massa = atributos['player_massa'][1]
                 self.contador += 1
+                self.quant_inimigos += self.inimigos_por_phase
                 
                 if atributos['modo'] == 'adventure':
                     config['fase'] += 1
@@ -239,7 +248,7 @@ class Jogo:
                 
 
                 if atributos['inimigos']:
-                    self.criar_inimigos(self.contador)
+                    self.criar_inimigos(self.quant_inimigos)
 
                 if atributos['modo']  != 'adventure':
                     self.fundo_cor = Transicions.Trans.backgroud_color(self.contador)
@@ -404,21 +413,310 @@ class Dificuldade:
         jogo.run(atributos)
     
     def adventure(tela):
-        atributos = {
-            'modo': 'adventure',
-            'inimigos': True,
-            'contador': [1],
-            'player_massa': [20, 20],
-            'pontos': [0],
-            'player_cor_number': [0, 0, 1, 0],
-            'player_velocidade': [360, 360, 355, 355],
-            'pontos_por_comida': [2, 2, 10, 5, 15],
-            'massa_comida': [5, 5],
-            'timer_tempo_real': [0],
-            'inimigo_cor': ['red'],
-            'criar_massas': [20]
-        }
-        
+        if config['level'] == 1:
+            atributos = {
+                'modo': 'adventure',
+                'inimigos': True,
+                'contador': [20],
+                'player_massa': [20, 20],
+                'pontos': [0],
+                'player_cor_number': [0, 0, 1, 0],
+                'player_velocidade': [360, 360, 355, 355],
+                'pontos_por_comida': [2, 2, 10, 5, 15],
+                'massa_comida': [5, 5],
+                'timer_tempo_real': [0],
+                'inimigo_cor': ['red'],
+                'criar_massas': [30],
+                'quant_inimigos': [1, 2, 3, 4, 5],
+            }
+
+        if config['level'] == 2:
+            atributos = {
+                'modo': 'adventure',
+                'inimigos': True,
+                'contador': [1],
+                'player_massa': [20, 20],
+                'pontos': [0],
+                'player_cor_number': [0, 0, 1, 0],
+                'player_velocidade': [360, 360, 355, 355],
+                'pontos_por_comida': [2, 2, 10, 5, 15],
+                'massa_comida': [5, 5],
+                'timer_tempo_real': [0],
+                'inimigo_cor': ['red'],
+                'criar_massas': [20],
+                'quant_inimigos': [1, 2, 3, 4, 5],
+            }
+
+        if config['level'] == 3:
+            atributos = {
+                'modo': 'adventure',
+                'inimigos': True,
+                'contador': [1],
+                'player_massa': [20, 20],
+                'pontos': [0],
+                'player_cor_number': [0, 0, 1, 0],
+                'player_velocidade': [360, 360, 355, 355],
+                'pontos_por_comida': [2, 2, 10, 5, 15],
+                'massa_comida': [5, 5],
+                'timer_tempo_real': [0],
+                'inimigo_cor': ['red'],
+                'criar_massas': [20],
+                'quant_inimigos': [2, 3, 4, 5, 6],
+            }
+        if config['level'] == 4:
+            atributos = {
+                'modo': 'adventure',
+                'inimigos': True,
+                'contador': [1],
+                'player_massa': [20, 20],
+                'pontos': [0],
+                'player_cor_number': [0, 0, 1, 0],
+                'player_velocidade': [360, 360, 355, 355],
+                'pontos_por_comida': [2, 2, 10, 5, 15],
+                'massa_comida': [5, 5],
+                'timer_tempo_real': [0],
+                'inimigo_cor': ['red'],
+                'criar_massas': [15],
+                'quant_inimigos': [2, 3, 4, 5, 6],
+            }
+
+        if config['level'] == 5:
+            atributos = {
+                'modo': 'adventure',
+                'inimigos': True,
+                'contador': [1],
+                'player_massa': [20, 20],
+                'pontos': [0],
+                'player_cor_number': [0, 0, 1, 0],
+                'player_velocidade': [360, 360, 355, 355],
+                'pontos_por_comida': [2, 2, 10, 5, 15],
+                'massa_comida': [5, 5],
+                'timer_tempo_real': [0],
+                'inimigo_cor': ['red'],
+                'criar_massas': [15],
+                'quant_inimigos': [3, 4, 5, 6, 7],
+            }
+
+        if config['level'] == 6:
+            atributos = {
+                'modo': 'adventure',
+                'inimigos': True,
+                'contador': [1],
+                'player_massa': [20, 20],
+                'pontos': [0],
+                'player_cor_number': [0, 0, 1, 0],
+                'player_velocidade': [360, 360, 355, 355],
+                'pontos_por_comida': [2, 2, 10, 5, 15],
+                'massa_comida': [5, 5],
+                'timer_tempo_real': [0],
+                'inimigo_cor': ['red'],
+                'criar_massas': [10],
+                'quant_inimigos': [2, 3, 4, 5, 6],
+            }
+
+        if config['level'] == 7:
+            atributos = {
+                'modo': 'adventure',
+                'inimigos': True,
+                'contador': [1],
+                'player_massa': [20, 20],
+                'pontos': [0],
+                'player_cor_number': [0, 0, 1, 0],
+                'player_velocidade': [360, 360, 355, 355],
+                'pontos_por_comida': [2, 2, 10, 5, 15],
+                'massa_comida': [5, 5],
+                'timer_tempo_real': [0],
+                'inimigo_cor': ['red'],
+                'criar_massas': [10],
+                'quant_inimigos': [3, 4, 5, 6, 7],
+            }
+
+        if config['level'] == 8:
+            atributos = {
+                'modo': 'adventure',
+                'inimigos': True,
+                'contador': [1],
+                'player_massa': [20, 20],
+                'pontos': [0],
+                'player_cor_number': [0, 0, 1, 0],
+                'player_velocidade': [360, 360, 355, 355],
+                'pontos_por_comida': [2, 2, 10, 5, 15],
+                'massa_comida': [5, 5],
+                'timer_tempo_real': [0],
+                'inimigo_cor': ['red'],
+                'criar_massas': [5],
+                'quant_inimigos': [2, 3, 4, 5, 6],
+            }
+
+        if config['level'] == 9:
+            atributos = {
+                'modo': 'adventure',
+                'inimigos': True,
+                'contador': [1],
+                'player_massa': [20, 20],
+                'pontos': [0],
+                'player_cor_number': [0, 0, 1, 0],
+                'player_velocidade': [360, 360, 355, 355],
+                'pontos_por_comida': [2, 2, 10, 5, 15],
+                'massa_comida': [5, 5],
+                'timer_tempo_real': [0],
+                'inimigo_cor': ['red'],
+                'criar_massas': [5],
+                'quant_inimigos': [3, 4, 5, 6, 7],
+            }
+
+        if config['level'] == 10:
+            atributos = {
+                'modo': 'adventure',
+                'inimigos': True,
+                'contador': [1],
+                'player_massa': [20, 20],
+                'pontos': [0],
+                'player_cor_number': [0, 0, 1, 0],
+                'player_velocidade': [360, 360, 355, 355],
+                'pontos_por_comida': [2, 2, 10, 5, 15],
+                'massa_comida': [5, 5],
+                'timer_tempo_real': [0],
+                'inimigo_cor': ['red'],
+                'criar_massas': [5],
+                'quant_inimigos': [4, 5, 6, 7, 8],
+            }
+
+        if config['level'] == 10:
+            atributos = {
+                'modo': 'adventure',
+                'inimigos': True,
+                'contador': [1],
+                'player_massa': [20, 20],
+                'pontos': [0],
+                'player_cor_number': [0, 0, 1, 0],
+                'player_velocidade': [360, 360, 355, 355],
+                'pontos_por_comida': [2, 2, 10, 5, 15],
+                'massa_comida': [5, 5],
+                'timer_tempo_real': [0],
+                'inimigo_cor': ['red'],
+                'criar_massas': [5],
+                'quant_inimigos': [4, 5, 6, 7, 8],
+            }
+
+        if config['level'] == 11:
+            atributos = {
+                'modo': 'adventure',
+                'inimigos': True,
+                'contador': [1],
+                'player_massa': [20, 20],
+                'pontos': [0],
+                'player_cor_number': [0, 0, 1, 0],
+                'player_velocidade': [360, 360, 355, 355],
+                'pontos_por_comida': [2, 2, 10, 5, 15],
+                'massa_comida': [5, 5],
+                'timer_tempo_real': [0],
+                'inimigo_cor': ['red'],
+                'criar_massas': [15],
+                'quant_inimigos': [1, 2, 3, 4, 15],
+            }    
+
+        if config['level'] == 12:
+            atributos = {
+                'modo': 'adventure',
+                'inimigos': True,
+                'contador': [1],
+                'player_massa': [20, 20],
+                'pontos': [0],
+                'player_cor_number': [0, 0, 1, 0],
+                'player_velocidade': [360, 360, 355, 355],
+                'pontos_por_comida': [2, 2, 10, 5, 15],
+                'massa_comida': [5, 5],
+                'timer_tempo_real': [0],
+                'inimigo_cor': ['red'],
+                'criar_massas': [15],
+                'quant_inimigos': [1, 2, 4, 8, 16],
+            }    
+
+        if config['level'] == 13:
+            atributos = {
+                'modo': 'adventure',
+                'inimigos': True,
+                'contador': [1],
+                'player_massa': [20, 20],
+                'pontos': [0],
+                'player_cor_number': [0, 0, 1, 0],
+                'player_velocidade': [360, 360, 355, 355],
+                'pontos_por_comida': [2, 2, 10, 5, 15],
+                'massa_comida': [5, 5],
+                'timer_tempo_real': [0],
+                'inimigo_cor': ['red'],
+                'criar_massas': [5],
+                'quant_inimigos': [4, 6, 8, 10, 12],
+            }    
+
+        if config['level'] == 14:
+            atributos = {
+                'modo': 'adventure',
+                'inimigos': True,
+                'contador': [1],
+                'player_massa': [20, 20],
+                'pontos': [0],
+                'player_cor_number': [0, 0, 1, 0],
+                'player_velocidade': [360, 360, 355, 355],
+                'pontos_por_comida': [2, 2, 10, 5, 15],
+                'massa_comida': [5, 5],
+                'timer_tempo_real': [0],
+                'inimigo_cor': ['red'],
+                'criar_massas': [5],
+                'quant_inimigos': [6, 8, 10, 12, 14],
+            }    
+
+        if config['level'] == 15:
+            atributos = {
+                'modo': 'adventure',
+                'inimigos': True,
+                'contador': [1],
+                'player_massa': [20, 20],
+                'pontos': [0],
+                'player_cor_number': [0, 0, 1, 0],
+                'player_velocidade': [360, 360, 355, 355],
+                'pontos_por_comida': [2, 2, 30, 5, 15],
+                'massa_comida': [5, 5],
+                'timer_tempo_real': [0],
+                'inimigo_cor': ['red'],
+                'criar_massas': [3],
+                'quant_inimigos': [2, 4, 6, 8, 10],
+            }    
+
+        if config['level'] == 16:
+            atributos = {
+                'modo': 'adventure',
+                'inimigos': True,
+                'contador': [1],
+                'player_massa': [20, 20],
+                'pontos': [0],
+                'player_cor_number': [0, 0, 1, 0],
+                'player_velocidade': [360, 360, 355, 355],
+                'pontos_por_comida': [2, 2, 30, 5, 15],
+                'massa_comida': [5, 5],
+                'timer_tempo_real': [0],
+                'inimigo_cor': ['red'],
+                'criar_massas': [3],
+                'quant_inimigos': [1, 2, 3, 4, 17],
+            }    
+
+        if config['level'] == 17:
+            atributos = {
+                'modo': 'adventure',
+                'inimigos': True,
+                'contador': [1],
+                'player_massa': [20, 20],
+                'pontos': [0],
+                'player_cor_number': [0, 0, 1, 0],
+                'player_velocidade': [360, 360, 355, 355],
+                'pontos_por_comida': [2, 2, 10, 5, 15],
+                'massa_comida': [5, 5],
+                'timer_tempo_real': [0],
+                'inimigo_cor': ['red'],
+                'criar_massas': [3],
+                'quant_inimigos': [1, 2, 3, 4, 17],
+            }    
 
         jogo = Jogo()
         jogo.run(atributos)
@@ -496,14 +794,12 @@ class Functions:
                         
                         if PLAY_MAIN_MENU.checkForInput(PLAY_MOUSE_POS):
                             c = True
-                            Start()
+                            Start().start()
                             
 
                 pygame.display.update()
 
     def level_select(tela):
-        LEVEIS = [ v + 1 for v in range(config['maxlevel'])]
-        
         botao_level = []
         terminate = False
 
@@ -543,7 +839,7 @@ class Functions:
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     for c in range(30):
                         if botao_level[c].checkForInput(PLAY_MOUSE_POS):
-                            if len(LEVEIS) < c+1:
+                            if config['maxlevel'] < c+1: # se o maxlevel for menor que o level que ele clicou
                                 pass
                             else:
                                 config['level'] = c + 1 
@@ -556,4 +852,5 @@ class Functions:
 
             
 if __name__ == "__main__":
-    Start()
+    app = Start()
+    asyncio.run(app.start())
